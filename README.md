@@ -1,2 +1,2 @@
-# tienlien
-Online multiplayer version of TienLien ("Thirteen").
+# tienlen
+Online multiplayer version of TienLen ("Thirteen").
