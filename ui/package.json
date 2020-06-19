@@ -1,0 +1,61 @@
+{
+  "name": "tienlen",
+  "description": "Front-end for the Tiến lên (aka. Thirteen) server",
+  "author": "anthony.ishkan@gmail.com",
+  "private": true,
+  "scripts": {
+    "dev": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "deploy": "vue-cli-service build",
+    "lint": "vue-cli-service lint --no-fix",
+    "lint-fix": "vue-cli-service lint",
+    "inspect": "vue-cli-service inspect",
+    "report": "vue-cli-service build --report"
+  },
+  "dependencies": {
+    "lodash-es": "*",
+    "vue": "*",
+    "vue-toasted": "*",
+    "vuedraggable": "^2.23.2",
+    "vuex": "*",
+    "vuex-class-modules": "*",
+    "vuex-typex": "*"
+  },
+  "devDependencies": {
+    "@babel/core": "*",
+    "@types/lodash-es": "*",
+    "@typescript-eslint/eslint-plugin": "*",
+    "@typescript-eslint/parser": "*",
+    "@vue/cli-plugin-babel": "*",
+    "@vue/cli-plugin-eslint": "*",
+    "@vue/cli-plugin-typescript": "*",
+    "@vue/cli-service": "*",
+    "@vue/eslint-config-prettier": "*",
+    "@vue/eslint-config-typescript": "*",
+    "babel-eslint": "*",
+    "babel-loader": "*",
+    "babel-preset-vue": "*",
+    "compression-webpack-plugin": "*",
+    "core-js": "*",
+    "eslint": "*",
+    "eslint-plugin-vue": "*",
+    "lint-staged": "*",
+    "postcss-import": "*",
+    "postcss-preset-env": "*",
+    "typescript": "*",
+    "vue-template-compiler": "*"
+  },
+  "gitHooks": {
+    "pre-commit": "lint-staged"
+  },
+  "lint-staged": {
+    "*.js": [
+      "vue-cli-service lint",
+      "git add"
+    ],
+    "*.vue": [
+      "vue-cli-service lint",
+      "git add"
+    ]
+  }
+}
