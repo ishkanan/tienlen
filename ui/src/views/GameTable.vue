@@ -111,5 +111,19 @@ export default Vue.extend({
   border: 4mm ridge rgba(170, 50, 50, .6);
   border-radius: 5%;
   padding: 20px;
+  margin: auto;
+}
+
+@media (max-width: 1100px) {
+  .table {
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    box-shadow: none;
+    border: 0;
+    border-radius: 0;
+    padding: 0;
+  }
 }
 </style>

@@ -91,10 +91,38 @@ export default Vue.extend({
 
   & .disconnected {
     width: 80px;
-    height: 90px;
+    height: 80px;
     background: url(../assets/images/disconnected.png);
-    background-size: contain;
+    background-size: cover;
     background-repeat: no-repeat;
+  }
+}
+
+@media (max-width: 1100px) {
+  .viewport {
+    width: 100%;
+    height: 100%;
+  }
+
+  .nameAndCard {
+    flex-direction: row;
+    justify-content: space-between;
+
+    & h3 {
+      margin: 0;
+      font-size: 1em;
+      padding: 2px 6px 2px 6px;
+    }
+
+    & .cardsLeft {
+      font-size: 1.1em;
+      padding-top: 6px;
+    }
+
+    & .disconnected {
+      width: 50px;
+      height: 50px;
+    }
   }
 }
 </style>

@@ -78,6 +78,7 @@ func (g *Game) ConnectionStateChanged(connUUID uuid.UUID, conn IMessageSink, sta
 
 	player := g.connections[connID].Player
 	if player != nil {
+		player.Connected = false
 		g.sendToAllPlayers(playerDisconnectedResponse{Player: *player})
 		utils.LogInfo("ConnectionStateChanged: %s has disconnected", player.Name)
 		if g.state == gameStateInLobby {
@@ -90,7 +91,6 @@ func (g *Game) ConnectionStateChanged(connUUID uuid.UUID, conn IMessageSink, sta
 				}
 			}
 		} else if g.state == gameStateRunning {
-			player.Connected = false
 			g.state = gameStatePaused
 			g.sendToAllPlayers(gamePausedResponse{})
 			utils.LogInfo("ConnectionStateChanged: Game is paused due to player disconnect")

@@ -45,4 +45,28 @@ export default Vue.extend({});
 .discard {
   grid-area: 3 / 3 / 5 / 9;
 }
+
+@media (max-width: 1100px) {
+  .viewport {
+    grid-template-columns: repeat(10, 10%);
+    grid-template-rows: repeat(20, 5%);
+  }
+
+  .opponent1 {
+    grid-area: 1 / 3 / 3 / 9;
+    margin-top: 10px;
+  }
+
+  .opponent2 {
+    grid-area: 3 / 3 / 5 / 9;
+  }
+
+  .discard {
+    grid-area: 5 / 1 / 9 / 11;
+  }
+
+  .player {
+    grid-area: 10 / 1 / 14 / 11;
+  }
+}
 </style>

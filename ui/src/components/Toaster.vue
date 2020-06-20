@@ -10,7 +10,7 @@ import { game } from '~/store/game';
 
 const toastOptions = {
   position: 'top-right' as ToastPosition,
-  duration: 10000,
+  duration: window.innerWidth < 1100 ? 5000 : 10000,
   keepOnHover: true,
   action: {
     text: 'Close',
@@ -51,5 +51,11 @@ export default Vue.extend({
 <style lang="postcss" module>
 :global(.toasted) {
   font-size: 18px !important;
+}
+
+@media (max-width: 1100px) {
+  :global(.toasted) {
+    font-size: 13px !important;
+  }
 }
 </style>

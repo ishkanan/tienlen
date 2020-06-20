@@ -33,8 +33,13 @@ export default Vue.extend({
   height: 100vh;
   width: 100vw;
   display: flex;
-  margin: auto;
   align-items: center;
   justify-content: center;
+}
+
+@media (max-width: 1100px) {
+  .app {
+    margin: auto;
+  }
 }
 </style>
