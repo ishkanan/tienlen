@@ -83,7 +83,7 @@ func (g *Game) ConnectionStateChanged(connUUID uuid.UUID, conn IMessageSink, sta
 		utils.LogInfo("ConnectionStateChanged: %s has disconnected", player.Name)
 		if g.state == gameStateInLobby {
 			// no need to keep place for player if game hasn't started
-			g.players = g.players.DeleteByID(player.ID)
+			g.players = g.players.DeleteByName(player.Name)
 			// but we re-number positions to be sequential
 			for _, p := range g.players {
 				if p.Position > player.Position {
@@ -136,7 +136,7 @@ func (g *Game) ProcessRequest(connUUID uuid.UUID, request interface{}, requestTy
 		return
 	}
 
-	if g.players.CurrentTurn().ID != g.connections[connID].Player.ID {
+	if g.players.CurrentTurn().Name != g.connections[connID].Player.Name {
 		g.sendOnConnection(connID, errorResponse{Kind: errKindOutOfTurn})
 		return
 	}
@@ -170,7 +170,6 @@ func (g *Game) processJoinGameRequest(connID string, req joinGameRequest) {
 			utils.LogInfo("processJoinGameRequest: %s tried to join, but game is full", connID)
 			return
 		}
-		id, _ := uuid.Parse(connID)
 		position := g.players.NextAvailablePosition()
 		name := strings.TrimSpace(req.PlayerName)
 		if g.players.GetByName(name) != nil {
@@ -180,14 +179,14 @@ func (g *Game) processJoinGameRequest(connID string, req joinGameRequest) {
 			return
 		}
 		if name == "" {
-			name = g.players.theyWhoNotBeNamed()
+			name = g.players.TheyWhoNotBeNamed()
 		}
 		thePlayer = &player{
-			ID:       id,
 			Name:     name,
 			Position: position,
 		}
 		g.players = append(g.players, thePlayer)
+		g.players.ResetAllGameStatuses()
 	}
 
 	thePlayer.Connected = true
@@ -218,9 +217,7 @@ func (g *Game) processStartGameRequest(connID string) {
 
 	deck := buildShuffledDeck()
 	for i, player := range g.players {
-		player.IsPassed = false
-		player.IsTurn = false
-		player.Hand = deck[i*13 : (i*13)+13]
+		player.Hand = globalRankSort(deck[i*13 : (i*13)+13])
 		player.CardsLeft = 13
 	}
 
@@ -228,8 +225,8 @@ func (g *Game) processStartGameRequest(connID string) {
 	if first == nil {
 		first = g.players.WithLowestCard()
 	}
-	g.lastPlayed = nil
 	first.IsTurn = true
+	g.lastPlayed = nil
 	g.state = gameStateRunning
 	g.firstRound = true
 	g.newRound = true
@@ -254,7 +251,7 @@ func (g *Game) processTurnPassRequest(connID string) {
 	nextPlayer.IsTurn = true
 
 	// if only one player left who hasn't passed, start new round
-	if g.players.NextTurn(nextPlayer).ID == nextPlayer.ID {
+	if g.players.NextTurn(nextPlayer).Name == nextPlayer.Name {
 		for _, player := range g.players {
 			player.IsPassed = false
 		}
@@ -313,23 +310,18 @@ func (g *Game) processTurnPlayRequest(connID string, req turnPlayRequest) {
 		return
 	}
 
-	g.lastPlayed = cardsToPlay
-	g.firstRound = false
-	g.newRound = false
 	thePlayer.CardsLeft = len(newHand)
 	thePlayer.Hand = newHand
 	thePlayer.IsTurn = false
+	g.firstRound = false
+	g.lastPlayed = cardsToPlay
+	g.newRound = false
 	g.players.NextTurn(thePlayer).IsTurn = len(newHand) > 0
+	g.players.SetLastPlayed(*thePlayer)
 	won := len(thePlayer.Hand) == 0 || (determinePattern(cardsToPlay) == patternQuad && cardsToPlay[0].FaceValue == 2)
 	if won {
 		g.state = gameStateInLobby
-		for _, player := range g.players {
-			player.CardsLeft = 0
-			player.Hand = nil
-			player.IsPassed = false
-			player.IsTurn = false
-			player.WonLastGame = false
-		}
+		g.players.ResetAllGameStatuses()
 		thePlayer.WonLastGame = true
 	}
 
@@ -352,7 +344,7 @@ func (g Game) disconnectedCount() int {
 	for _, player := range g.players {
 		found := false
 		for _, context := range g.connections {
-			found = found || (context.Player != nil && context.Player.ID == player.ID)
+			found = found || (context.Player != nil && context.Player.Name == player.Name)
 		}
 		if !found {
 			count++
@@ -391,7 +383,7 @@ func (g Game) sendStateToAllPlayers() {
 	for _, context := range g.connections {
 		opponents := []player{}
 		for _, player := range g.players {
-			if player.ID != context.Player.ID {
+			if player.Name != context.Player.Name {
 				opponents = append(opponents, *player)
 			}
 		}

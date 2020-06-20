@@ -26,6 +26,7 @@
 import Vue from 'vue';
 import CardView from '~/components/Card.vue';
 import { Card, Player, Suit } from '~/lib/models';
+import { setTitle } from '~/lib/utils';
 import { game } from '~/store/game';
 
 export default Vue.extend({
@@ -52,6 +53,26 @@ export default Vue.extend({
     opponent(): Player | undefined {
       return game.opponents.find(c => c.position === this.position);
     },
+    paused(): boolean {
+      return game.isPaused;
+    },
+  },
+
+  watch: {
+    opponent: {
+      immediate: true,
+      handler(value: Player | undefined) {
+        const name = value?.name || '';
+        value?.isTurn && setTitle(`Tiến lên || ${name}`);
+      },
+    },
+    paused: {
+      immediate: true,
+      handler(value: boolean) {
+        const name = this.opponent?.name || '';
+        !value && this.opponent?.isTurn && setTitle(`Tiến lên || ${name}`);
+      },
+    },
   },
 });
 </script>
@@ -73,6 +94,7 @@ export default Vue.extend({
   & h3 {
     color: #f2f2f2;
     margin-bottom: 10px;
+    padding: 2px 6px 2px 6px;
   }
 
   & .cardsLeft {
@@ -85,7 +107,6 @@ export default Vue.extend({
     background-color: #f2f2f2;
     border-radius: 5px;
     color: black;
-    padding: 2px 6px 2px 6px;
     border: 3px solid blue;
   }
 
@@ -111,7 +132,6 @@ export default Vue.extend({
     & h3 {
       margin: 0;
       font-size: 1em;
-      padding: 2px 6px 2px 6px;
     }
 
     & .cardsLeft {

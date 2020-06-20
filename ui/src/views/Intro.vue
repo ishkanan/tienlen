@@ -15,6 +15,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import { joinGame } from '~/lib/socket';
+import { setTitle } from '~/lib/utils';
 import { game, ConnectionState } from '~/store/game';
 
 export default Vue.extend({
@@ -32,6 +33,10 @@ export default Vue.extend({
     },
   },
 
+  created() {
+    setTitle('Tiến lên (Thirteen)');
+  },
+
   methods: {
     connect() {
       joinGame({ name: this.name });
@@ -44,7 +49,7 @@ export default Vue.extend({
 .viewport {
   width: 600px;
   height: 200px;
-  background-color: hsla(100, 75%, 25%, .80);
+  background-color: rgba(48, 112, 16, 0.7);
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
   border: 4mm ridge rgba(170, 50, 50, .6);
   border-radius: 8%;

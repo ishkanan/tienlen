@@ -5,9 +5,9 @@
   >
     <div :class="$style.controls">
       <button v-if="canStart" @click="doStart">Start game</button>
-      <button v-if="canPlay" @click="doPlay">Play cards!</button>
-      <button v-if="canPass" @click="doPass">Pass turn!</button>
-      <h1 v-if="waiting">Waiting for turn...</h1>
+      <button v-if="canPlay" @click="doPlay">Play cards</button>
+      <button v-if="canPass" class="danger" @click="doPass">Pass turn</button>
+      <h2 v-if="waiting">Waiting for turn...</h2>
     </div>
 
     <div :class="$style.hand">
@@ -18,6 +18,7 @@
       />
       <ds-card
         v-else
+        :class="$style.unfaced"
         :card="unfaced"
         :selectable="false"
         :show-face="false"
@@ -35,6 +36,7 @@ import Vue from 'vue';
 import CardView from '~/components/Card.vue';
 import Hand from '~/components/Hand.vue';
 import { Card, Player, Suit } from '~/lib/models';
+import { startFlashTitle } from '~/lib/utils';
 import { requestStartGame, requestTurnPass, requestTurnPlay } from '~/lib/socket';
 import { game } from '~/store/game';
 
@@ -56,10 +58,13 @@ export default Vue.extend({
 
   computed: {
     waiting(): boolean {
-      return game.isInProgress && !!this.player && !this.player.isTurn;
+      return game.isInProgress &&
+        !!this.player &&
+        !this.player.isTurn;
     },
     canStart(): boolean {
-      return !game.isInProgress;
+      return !game.isInProgress &&
+        game.opponents.length > 0;
     },
     canPass(): boolean {
       return game.isInProgress &&
@@ -90,6 +95,26 @@ export default Vue.extend({
         globalRank: 1,
         suitRank: 1,
       };
+    },
+    paused(): boolean {
+      return game.isPaused;
+    },
+  },
+
+  watch: {
+    canPlay: {
+      immediate: true,
+      handler(value: boolean) {
+        const name = this.player?.name || '';
+        value && startFlashTitle(`Tiến lên || ${name}`, '★ ★ IT IS YOUR TURN ★ ★');
+      },
+    },
+    paused: {
+      immediate: true,
+      handler(value: boolean) {
+        const name = this.player?.name || '';
+        !value && this.player?.isTurn && startFlashTitle(`Tiến lên || ${name}`, '★ ★ IT IS YOUR TURN ★ ★');
+      },
     },
   },
 
@@ -132,7 +157,7 @@ export default Vue.extend({
   justify-content: center;
 
   & button:nth-child(2) {
-    margin-left: 40px;
+    margin-left: 80px;
   }
 
   & h1 {
@@ -142,10 +167,14 @@ export default Vue.extend({
 
 .hand {
   width: 100%;
-  margin-top: 30px;
+  margin-top: 20px;
   display: flex;
   flex-direction: row;
   justify-content: center;
+
+  & .unfaced {
+    margin-top: 40px;
+  }
 }
 
 .playerName {
@@ -186,6 +215,10 @@ export default Vue.extend({
 
   .hand {
     margin-top: 15px;
+
+    & .unfaced {
+      margin-top: 30px;
+    }
   }
 
   .playerName {

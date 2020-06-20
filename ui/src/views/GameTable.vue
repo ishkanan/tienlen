@@ -60,6 +60,7 @@ import TwoPlayers from '~/layouts/TwoPlayers.vue';
 import ThreePlayers from '~/layouts/ThreePlayers.vue';
 import FourPlayers from '~/layouts/FourPlayers.vue';
 import { Player } from '~/lib/models';
+import { setTitle } from '~/lib/utils';
 import { game } from '~/store/game';
 import DiscardView from '~/views/Discard.vue';
 import OpponentView from '~/views/Opponent.vue';
@@ -98,6 +99,28 @@ export default Vue.extend({
     player(): Player | undefined {
       return game.self;
     },
+    canStart(): boolean {
+      return !game.isInProgress &&
+        game.opponents.length > 0;
+    },
+    paused(): boolean {
+      return game.isPaused;
+    },
+  },
+
+  watch: {
+    canStart: {
+      immediate: true,
+      handler(value: boolean) {
+        value && setTitle('Tiến lên || waiting in lobby ...');
+      },
+    },
+    paused: {
+      immediate: true,
+      handler(value: boolean) {
+        value && setTitle('Tiến lên || game paused ...');
+      },
+    },
   },
 });
 </script>
@@ -106,7 +129,7 @@ export default Vue.extend({
 .table {
   height: 860px;
   width: 1600px;
-  background-color: hsla(100, 75%, 25%, .80);
+  background-color: rgba(48, 112, 16, 0.7);
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
   border: 4mm ridge rgba(170, 50, 50, .6);
   border-radius: 5%;

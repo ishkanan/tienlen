@@ -14,7 +14,6 @@ export interface Card {
 }
 
 export interface Player {
-  id: string;
   name: string;
   position: number;
   cardsLeft: number;
@@ -22,6 +21,7 @@ export interface Player {
   isTurn: boolean;
   wonLastGame: boolean;
   connected: boolean;
+  lastPlayed: boolean;
 }
 
 export enum GameEventKind {
