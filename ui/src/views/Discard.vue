@@ -81,4 +81,16 @@ export default Vue.extend({
   text-align: center;
   text-transform: uppercase;
 }
+
+@media (max-width: 1100px) {
+  .viewport {
+    border-radius: 0;
+    flex-wrap: wrap;
+    margin: 20px 0 0 0;
+
+    & h1 {
+      font-size: 1.6em;
+    }
+  }
+}
 </style>

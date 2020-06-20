@@ -56,7 +56,7 @@ export default Vue.extend({
 
   & h1 {
     color: white;
-    margin: 0 0 40px 0;
+    margin: 0;
   }
 
   & .controls {
@@ -77,6 +77,23 @@ export default Vue.extend({
     &:disabled {
       background: gray;
       color: #585858;
+    }
+  }
+}
+
+@media (max-width: 1100px) {
+  .viewport {
+    width: 100%;
+    box-shadow: none;
+    border: 2mm ridge rgba(170, 50, 50, .6);
+    border-radius: 4%;
+
+    & h1 {
+      font-size: 1.6em;
+    }
+
+    & .controls {
+      height: 40px;
     }
   }
 }

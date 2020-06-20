@@ -46,13 +46,16 @@ export default Vue.extend({
   },
 
   computed: {
+    scaleFactor(): number {
+      return window.innerWidth < 1100 ? 2 : 1;
+    },
     offsetX(): number {
       if (!this.showFace) return 0;
-      return 80 * this.card.faceValue;
+      return (80 / this.scaleFactor) * this.card.faceValue;
     },
     offsetY(): number {
-      if (!this.showFace) return [Suit.Spades, Suit.Clubs].includes(this.card.suit) ? 0 : 120;
-      return suitYmap[this.card.suit];
+      if (!this.showFace) return [Suit.Spades, Suit.Clubs].includes(this.card.suit) ? 0 : 120 / this.scaleFactor;
+      return suitYmap[this.card.suit] / this.scaleFactor;
     },
     style(): Record<string, unknown> {
       return {
@@ -77,5 +80,13 @@ export default Vue.extend({
   width: 80px;
   height: 120px;
   background: url(../assets/images/cards.png);
+}
+
+@media (max-width: 1100px) {
+  .card {
+    width: 40px;
+    height: 60px;
+    background-size: 560px 240px;
+  }
 }
 </style>

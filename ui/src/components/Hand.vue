@@ -3,6 +3,8 @@
     :list="orderedCards"
     :class="$style.hand"
     group="cards"
+    delay="150"
+    delay-on-touch-only="true"
     @start="drag = true"
     @end="drag = false"
   >
@@ -90,5 +92,16 @@ export default Vue.extend({
 
 .raised {
   margin-top: 0px !important;
+}
+
+@media (max-width: 1100px) {
+  .hand {
+    flex-wrap: wrap;
+    max-width: 100%;
+  }
+
+  .card {
+    margin-top: 30px;
+  }
 }
 </style>

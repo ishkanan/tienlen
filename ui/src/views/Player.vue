@@ -7,6 +7,7 @@
       <button v-if="canStart" @click="doStart">Start game</button>
       <button v-if="canPlay" @click="doPlay">Play cards!</button>
       <button v-if="canPass" @click="doPass">Pass turn!</button>
+      <h1 v-if="waiting">Waiting for turn...</h1>
     </div>
 
     <div :class="$style.hand">
@@ -54,6 +55,9 @@ export default Vue.extend({
   },
 
   computed: {
+    waiting(): boolean {
+      return game.isInProgress && !!this.player && !this.player.isTurn;
+    },
     canStart(): boolean {
       return !game.isInProgress;
     },
@@ -66,6 +70,7 @@ export default Vue.extend({
     },
     canPlay(): boolean {
       return game.isInProgress &&
+        !game.isPaused &&
         !!this.player &&
         this.player.isTurn;
     },
@@ -115,7 +120,7 @@ export default Vue.extend({
 .viewport {
   width: 100%;
   max-height: 100%;
-  margin: 20px 0 20 0;
+  margin: 20px 0 0 0;
 }
 
 .controls {
@@ -128,6 +133,10 @@ export default Vue.extend({
 
   & button:nth-child(2) {
     margin-left: 40px;
+  }
+
+  & h1 {
+    color: white;
   }
 }
 
@@ -156,5 +165,33 @@ export default Vue.extend({
   color: black;
   padding: 2px 6px 2px 6px;
   border: 3px solid blue;
+}
+
+@media (max-width: 1100px) {
+  .viewport {
+    max-width: 100%;
+    max-height: 0;
+    min-height: 100%;
+    margin: 0;
+  }
+
+  .controls {
+    height: 35px;
+    margin-top: 0;
+
+    & h1 {
+      font-size: 1.5em;
+    }
+  }
+
+  .hand {
+    margin-top: 15px;
+  }
+
+  .playerName {
+    & h3 {
+      font-size: 1em;
+    }
+  }
 }
 </style>
