@@ -82,6 +82,7 @@ func (g *Game) ConnectionStateChanged(connUUID uuid.UUID, conn IMessageSink, sta
 		g.sendToAllPlayers(playerDisconnectedResponse{Player: *player})
 		utils.LogInfo("ConnectionStateChanged: %s has disconnected", player.Name)
 		if g.state == gameStateInLobby {
+			g.players.ResetScores()
 			// no need to keep place for player if game hasn't started
 			g.players = g.players.DeleteByName(player.Name)
 			// but we re-number positions to be sequential
@@ -322,6 +323,7 @@ func (g *Game) processTurnPlayRequest(connID string, req turnPlayRequest) {
 	if won {
 		g.state = gameStateInLobby
 		g.players.ResetAllGameStatuses()
+		thePlayer.Score++
 		thePlayer.WonLastGame = true
 	}
 

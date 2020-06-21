@@ -12,6 +12,9 @@
     <div :class="$style.discard">
       <slot name="discard"/>
     </div>
+    <div :class="$style.controls">
+      <slot name="controls"/>
+    </div>
   </div>
 </template>
 
@@ -46,10 +49,18 @@ export default Vue.extend({});
   grid-area: 3 / 3 / 5 / 9;
 }
 
+.controls {
+  grid-area: 1 / 1 / 2 / 2;
+}
+
 @media (max-width: 1100px) {
   .viewport {
     grid-template-columns: repeat(10, 10%);
     grid-template-rows: repeat(20, 5%);
+  }
+
+  .player {
+    grid-area: 10 / 1 / 14 / 11;
   }
 
   .opponent1 {
@@ -65,8 +76,8 @@ export default Vue.extend({});
     grid-area: 5 / 1 / 9 / 11;
   }
 
-  .player {
-    grid-area: 10 / 1 / 14 / 11;
+  .controls {
+    grid-area: 1 / 1 / 2 / 3;
   }
 }
 </style>

@@ -7,6 +7,9 @@
       <template v-slot:discard>
         <ds-discard/>
       </template>
+      <template v-slot:controls>
+        <ds-controls/>
+      </template>
     </ds-one-player>
     <ds-two-players v-if="player && opponents.length === 1">
       <template v-slot:player>
@@ -17,6 +20,9 @@
       </template>
       <template v-slot:discard>
         <ds-discard/>
+      </template>
+      <template v-slot:controls>
+        <ds-controls/>
       </template>
     </ds-two-players>
     <ds-three-players v-if="player && opponents.length === 2">
@@ -31,6 +37,9 @@
       </template>
       <template v-slot:discard>
         <ds-discard/>
+      </template>
+      <template v-slot:controls>
+        <ds-controls/>
       </template>
     </ds-three-players>
     <ds-four-players v-if="player && opponents.length === 3">
@@ -49,6 +58,9 @@
       <template v-slot:discard>
         <ds-discard/>
       </template>
+      <template v-slot:controls>
+        <ds-controls/>
+      </template>
     </ds-four-players>
   </div>
 </template>
@@ -62,6 +74,7 @@ import FourPlayers from '~/layouts/FourPlayers.vue';
 import { Player } from '~/lib/models';
 import { setTitle } from '~/lib/utils';
 import { game } from '~/store/game';
+import ControlsView from '~/views/Controls.vue';
 import DiscardView from '~/views/Discard.vue';
 import OpponentView from '~/views/Opponent.vue';
 import PlayerView from '~/views/Player.vue';
@@ -79,6 +92,7 @@ export default Vue.extend({
     'ds-two-players': TwoPlayers,
     'ds-three-players': ThreePlayers,
     'ds-four-players': FourPlayers,
+    'ds-controls': ControlsView,
     'ds-discard': DiscardView,
     'ds-opponent': OpponentView,
     'ds-player': PlayerView,

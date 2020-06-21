@@ -17,6 +17,7 @@ type player struct {
 	WonLastGame bool   `json:"wonLastGame"`
 	Connected   bool   `json:"connected"`
 	LastPlayed  bool   `json:"lastPlayed"`
+	Score       int    `json:"score"`
 }
 
 // provides some helpers to help reduce clutter in game object
@@ -146,5 +147,12 @@ func (p players) ResetAllGameStatuses() {
 		player.IsTurn = false
 		player.LastPlayed = false
 		player.WonLastGame = false
+	}
+}
+
+// ResetScores resets the scores for all players
+func (p players) ResetScores() {
+	for _, player := range p {
+		player.Score = 0
 	}
 }

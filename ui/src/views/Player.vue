@@ -25,7 +25,8 @@
       />
     </div>
 
-    <div :class="$style.playerName">
+    <div :class="$style.nameBar">
+      <ds-block-icon v-if="passed" :class="$style.block"/>
       <h3 :class="{ [$style.isTurn]: player.isTurn }">{{ player.name }}</h3>
     </div>
   </div>
@@ -33,6 +34,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
+import BlockIcon from '~/components/BlockIcon.vue';
 import CardView from '~/components/Card.vue';
 import Hand from '~/components/Hand.vue';
 import { Card, Player, Suit } from '~/lib/models';
@@ -46,6 +48,7 @@ interface Data {
 
 export default Vue.extend({
   components: {
+    'ds-block-icon': BlockIcon,
     'ds-card': CardView,
     'ds-hand': Hand,
   },
@@ -68,6 +71,7 @@ export default Vue.extend({
     },
     canPass(): boolean {
       return game.isInProgress &&
+        !game.isPaused &&
         !game.firstRound &&
         !game.newRound &&
         !!this.player &&
@@ -98,6 +102,9 @@ export default Vue.extend({
     },
     paused(): boolean {
       return game.isPaused;
+    },
+    passed(): boolean {
+      return !!this.player && this.player.isPassed;
     },
   },
 
@@ -150,6 +157,7 @@ export default Vue.extend({
 
 .controls {
   width: 100%;
+  color: white;
   height: 45px;
   margin-top: 20px;
   display: flex;
@@ -177,23 +185,33 @@ export default Vue.extend({
   }
 }
 
-.playerName {
+.nameBar {
   display: flex;
   flex-direction: row;
+  align-items: center;
   justify-content: center;
   color: #f2f2f2;
 
-  & h3 {
-    margin-top: 10px;
+  & .block {
+    width: 24px;
+    height: 24px;
+    fill: red;
+    background-color: black;
+    border-radius: 12px;
   }
-}
 
-.isTurn {
-  background-color: #f2f2f2;
-  border-radius: 5px;
-  color: black;
-  padding: 2px 6px 2px 6px;
-  border: 3px solid blue;
+  & h3 {
+    margin: 10px 0 10px 0;
+    padding: 2px 6px 2px 6px;
+  }
+
+  & .isTurn {
+    background-color: #f2f2f2;
+    border-radius: 5px;
+    color: black;
+    padding: 2px 6px 2px 6px;
+    border: 3px solid blue;
+  }
 }
 
 @media (max-width: 1100px) {
@@ -221,7 +239,12 @@ export default Vue.extend({
     }
   }
 
-  .playerName {
+  .nameBar {
+    & .block {
+      width: 20px;
+      height: 20px;
+    }
+
     & h3 {
       font-size: 1em;
     }

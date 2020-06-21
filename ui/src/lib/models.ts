@@ -22,6 +22,7 @@ export interface Player {
   wonLastGame: boolean;
   connected: boolean;
   lastPlayed: boolean;
+  score: number;
 }
 
 export enum GameEventKind {
