@@ -127,6 +127,11 @@ func (g *Game) ProcessRequest(connUUID uuid.UUID, request interface{}, requestTy
 		return
 	}
 
+	if requestType == reflect.TypeOf(chatMessageRequest{}) {
+		req := request.(chatMessageRequest)
+		g.processSendChatRequest(connID, req)
+	}
+
 	if requestType == reflect.TypeOf(startGameRequest{}) {
 		g.processStartGameRequest(connID)
 		return
@@ -338,6 +343,21 @@ func (g *Game) processTurnPlayRequest(connID string, req turnPlayRequest) {
 		g.sendToAllPlayers(gameWonResponse{Player: *thePlayer})
 		utils.LogInfo("processTurnPlayRequest: %s has won the game", thePlayer.Name)
 	}
+}
+
+func (g *Game) processSendChatRequest(connID string, req chatMessageRequest) {
+	thePlayer := g.connections[connID].Player
+	message := strings.TrimSpace(req.Message)
+
+	if len(message) == 0 {
+		g.sendOnConnection(connID, errorResponse{Kind: errKindInvalidChat})
+		return
+	}
+
+	g.sendToAllPlayers(chatMessageResponse{
+		Player:  *thePlayer,
+		Message: message,
+	})
 }
 
 // returns the number of disconnected players (who we've kept places for)

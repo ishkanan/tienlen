@@ -50,6 +50,15 @@ export interface GameWonResponse {
   player: Player;
 }
 
+export interface ChatMessageRequest {
+  message: string;
+}
+
+export interface ChatMessageResponse {
+  player: Player;
+  message: string;
+}
+
 export enum GameState {
   InLobby = 1,
   Running = 2,
@@ -77,6 +86,7 @@ export enum ErrorKind {
   MustPlayLowest = 8,
   NameTaken = 9,
   GameFull = 10,
+  InvalidChat = 11,
 }
 
 export interface ErrorResponse {

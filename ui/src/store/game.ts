@@ -1,5 +1,6 @@
 import { VuexModule, Module, Action } from 'vuex-class-modules';
 import {
+  ChatMessageResponse,
   ErrorKind,
   ErrorResponse,
   GamePausedResponse,
@@ -23,6 +24,11 @@ export enum ConnectionState {
   Connected = 2
 }
 
+export interface ChatEntry {
+  playerName: string;
+  message: string;
+}
+
 @Module({ generateMutationSetters: true })
 class Game extends VuexModule {
   connState: ConnectionState = ConnectionState.NotConnected;
@@ -35,6 +41,7 @@ class Game extends VuexModule {
   lastPlayed: Card[] = [];
   firstRound = true;
   newRound = true;
+  chats: ChatEntry[] = [];
 
   private errorMap = {
     [ErrorKind.LobbyNotReady]: 'Game is not ready to start yet.',
@@ -47,6 +54,7 @@ class Game extends VuexModule {
     [ErrorKind.MustPlayLowest]: 'Must play lowest card.',
     [ErrorKind.NameTaken]: 'That name is already taken.',
     [ErrorKind.GameFull]: 'The game is full.',
+    [ErrorKind.InvalidChat]: 'Chat message not provided.',
   };
 
   get isInLobby(): boolean {
@@ -140,6 +148,14 @@ class Game extends VuexModule {
     this.events.push({
       kind: GameEventKind.Info,
       message: `${response.player.name} has won the game.`,
+    });
+  }
+
+  @Action
+  chatMessage({ response }: { response: ChatMessageResponse }) {
+    this.chats.push({
+      playerName: response.player.name,
+      message: response.message,
     });
   }
 

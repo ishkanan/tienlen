@@ -65,6 +65,17 @@ type gameWonResponse struct {
 	Player player `json:"player"`
 }
 
+// contains a chat message from a player
+type chatMessageRequest struct {
+	Message string `json:"message"`
+}
+
+// informs all players of a chat message from a player
+type chatMessageResponse struct {
+	Player  player `json:"player"`
+	Message string `json:"message"`
+}
+
 // provides all players with a full game state refresh
 type gameStateRefreshResponse struct {
 	Opponents  []player  `json:"opponents"`
@@ -89,6 +100,7 @@ const (
 	errKindMustPlayLowest errorKind = 8
 	errKindNameTaken      errorKind = 9
 	errKindGameFull       errorKind = 10
+	errKindInvalidChat    errorKind = 11
 )
 
 // informs a player of an invalid request

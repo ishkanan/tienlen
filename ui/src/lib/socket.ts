@@ -1,8 +1,9 @@
 import { game, ConnectionState } from '~/store/game';
 import { Card } from './models';
 import {
-  Message,
+  ChatMessageRequest,
   JoinGameRequest,
+  Message,
   StartGameRequest,
   TurnPassRequest,
   TurnPlayRequest,
@@ -23,7 +24,7 @@ export function joinGame({ name }: { name: string }): void {
   socket.onopen = () => {
     game.connState = ConnectionState.Connected;
     const request: JoinGameRequest = { 'playerName': name };
-    sendMessage({
+    sendRequest({
       kind: 'JOIN_GAME',
       request,
     });
@@ -32,7 +33,7 @@ export function joinGame({ name }: { name: string }): void {
 
 export function requestStartGame(): void {
   const request: StartGameRequest = {};
-  sendMessage({
+  sendRequest({
     kind: 'START_GAME',
     request,
   });
@@ -40,7 +41,7 @@ export function requestStartGame(): void {
 
 export function requestTurnPass(): void {
   const request: TurnPassRequest = {};
-  sendMessage({
+  sendRequest({
     kind: 'TURN_PASS',
     request,
   });
@@ -48,13 +49,21 @@ export function requestTurnPass(): void {
 
 export function requestTurnPlay({ cards }: { cards: Card[] }): void {
   const request: TurnPlayRequest = { cards: cards.map(c => c.globalRank) };
-  sendMessage({
+  sendRequest({
     kind: 'TURN_PLAY',
     request,
   });
 }
 
-function sendMessage({ kind, request }: { kind: string, request: JoinGameRequest | StartGameRequest | TurnPassRequest | TurnPlayRequest }) {
+export function requestChatMessage({ message }: { message: string }): void {
+  const request: ChatMessageRequest = { message };
+  sendRequest({
+    kind: 'SEND_CHAT',
+    request,
+  });
+}
+
+function sendRequest({ kind, request }: { kind: string, request: JoinGameRequest | StartGameRequest | TurnPassRequest | TurnPlayRequest }) {
   if (!socket || game.connState !== ConnectionState.Connected ) return;
   const message: Message = {
     kind,
@@ -74,6 +83,7 @@ const actions: Record<string, any> = {
   'ROUND_WON': game.roundWon,
   'TURN_PLAYED': game.turnPlayed,
   'GAME_WON': game.gameWon,
+  'CHAT_MESSAGE': game.chatMessage,
   'GAME_STATE_REFRESH': game.gameStateRefresh,
   'ERROR': game.actionError,
 };

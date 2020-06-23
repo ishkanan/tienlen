@@ -81,6 +81,10 @@ func buildRequest(ident string, data []byte) (interface{}, error) {
 		request := turnPlayRequest{}
 		err := json.Unmarshal(data, &request)
 		return request, err
+	case "SEND_CHAT":
+		request := chatMessageRequest{}
+		err := json.Unmarshal(data, &request)
+		return request, err
 	default:
 		return nil, fmt.Errorf("unrecognised request type (%s)", ident)
 	}
@@ -98,6 +102,7 @@ func responseMap() map[reflect.Type]string {
 		reflect.TypeOf(roundWonResponse{}):           "ROUND_WON",
 		reflect.TypeOf(turnPlayedResponse{}):         "TURN_PLAYED",
 		reflect.TypeOf(gameWonResponse{}):            "GAME_WON",
+		reflect.TypeOf(chatMessageResponse{}):        "CHAT_MESSAGE",
 		reflect.TypeOf(gameStateRefreshResponse{}):   "GAME_STATE_REFRESH",
 		reflect.TypeOf(errorResponse{}):              "ERROR",
 	}
