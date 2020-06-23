@@ -16,7 +16,7 @@
     "lodash-es": "*",
     "vue": "*",
     "vue-toasted": "*",
-    "vuedraggable": "^2.23.2",
+    "vuedraggable": "*",
     "vuex": "*",
     "vuex-class-modules": "*",
     "vuex-typex": "*"

@@ -9,16 +9,23 @@
       <h1 v-else :class="$style.message">Start the game...</h1>
     </template>
     <template v-else>
-      <h1 v-if="inLobby && previousWinner" :class="$style.message">
-        {{ previousWinner.name }} won the game!
-      </h1>
-      <ds-card
-        v-for="card in lastPlayed"
-        :key="card.globalRank"
-        :card="card"
-        :selectable="false"
-        :show-face="true"
-      />
+      <div :class="$style.messageAndLastPlayed">
+        <h2 v-if="inLobby && previousWinner" :class="$style.message">
+          {{ previousWinner.name }} won the game!
+        </h2>
+        <h2 v-else-if="lastPlayedCards.length > 0 && !!lastPlayed">
+          {{ lastPlayed.name }} played:
+        </h2>
+        <div :class="$style.lastPlayed">
+          <ds-card
+            v-for="card in lastPlayedCards"
+            :key="card.globalRank"
+            :card="card"
+            :selectable="false"
+            :show-face="true"
+          />
+        </div>
+      </div>
     </template>
   </div>
 </template>
@@ -37,8 +44,8 @@ export default Vue.extend({
 
   computed: {
     previousWinner(): Player | undefined {
-      return game.opponents.find(o => o.wonLastGame) ??
-        (game.self?.wonLastGame ? game.self : undefined);
+      if (game.self?.wonLastGame) return game.self;
+      return game.opponents.find(o => o.wonLastGame);
     },
     canStart(): boolean {
       return this.inLobby && game.opponents.length > 0;
@@ -52,8 +59,12 @@ export default Vue.extend({
     paused(): boolean {
       return game.isPaused;
     },
-    lastPlayed(): Card[] {
+    lastPlayedCards(): Card[] {
       return sortBy(game.lastPlayed || [], c => 52 - c.globalRank);
+    },
+    lastPlayed(): Player | undefined {
+      if (game.self?.lastPlayed) return game.self;
+      return game.opponents.find(o => o.lastPlayed);
     },
   },
 });
@@ -66,9 +77,27 @@ export default Vue.extend({
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: hsla(130, 75%, 25%, .80);
+  background-color: rgba(200, 200, 200, 0.4);
   border: black dashed 1px;
   border-radius: 10px;
+}
+
+.messageAndLastPlayed {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.lastPlayed {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
 }
 
 .winner {
@@ -76,7 +105,7 @@ export default Vue.extend({
 }
 
 .message {
-  color: white;
+  color: black;
   font-size: 40px;
   text-align: center;
   text-transform: uppercase;
@@ -90,6 +119,10 @@ export default Vue.extend({
 
     & h1 {
       font-size: 1.6em;
+    }
+
+    & h2 {
+      font-size: 1.3em;
     }
   }
 }

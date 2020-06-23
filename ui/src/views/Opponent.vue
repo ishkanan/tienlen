@@ -3,8 +3,11 @@
     v-if="opponent"
     :class="$style.viewport"
   >
-    <div :class="$style.nameAndCard">
-      <h3 :class="{ [$style.isTurn]: opponent.isTurn }">{{ opponent.name }}</h3>
+    <div :class="$style.player">
+      <span :class="$style.nameBar">
+        <ds-block-icon v-if="passed" :class="$style.block"/>
+        <h3 :class="{ [$style.isTurn]: opponent.isTurn }">{{ opponent.name }}</h3>
+      </span>
       <div v-if="!opponent.connected" :class="$style.disconnected"/>
       <ds-card
         v-else
@@ -24,12 +27,15 @@
 
 <script lang="ts">
 import Vue from 'vue';
+import BlockIcon from '~/components/BlockIcon.vue';
 import CardView from '~/components/Card.vue';
 import { Card, Player, Suit } from '~/lib/models';
+import { setTitle } from '~/lib/utils';
 import { game } from '~/store/game';
 
 export default Vue.extend({
   components: {
+    'ds-block-icon': BlockIcon,
     'ds-card': CardView,
   },
 
@@ -52,6 +58,29 @@ export default Vue.extend({
     opponent(): Player | undefined {
       return game.opponents.find(c => c.position === this.position);
     },
+    paused(): boolean {
+      return game.isPaused;
+    },
+    passed(): boolean {
+      return !!this.opponent && this.opponent.isPassed;
+    },
+  },
+
+  watch: {
+    opponent: {
+      immediate: true,
+      handler(value: Player | undefined) {
+        const name = value?.name || '';
+        value?.isTurn && setTitle(`Tiến lên || ${name}`);
+      },
+    },
+    paused: {
+      immediate: true,
+      handler(value: boolean) {
+        const name = this.opponent?.name || '';
+        !value && this.opponent?.isTurn && setTitle(`Tiến lên || ${name}`);
+      },
+    },
   },
 });
 </script>
@@ -62,7 +91,7 @@ export default Vue.extend({
   max-height: 100%;
 }
 
-.nameAndCard {
+.player {
   width: 100%;
   height: 100%;
   display: flex;
@@ -70,23 +99,38 @@ export default Vue.extend({
   align-items: center;
   justify-content: center;
 
+  & .nameBar {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+
+    & .block {
+      width: 24px;
+      height: 24px;
+      fill: red;
+      background-color: black;
+      border-radius: 12px;
+    }
+
+    & .isTurn {
+      background-color: #f2f2f2;
+      border-radius: 5px;
+      color: black;
+      border: 3px solid blue;
+    }
+  }
+
   & h3 {
     color: #f2f2f2;
-    margin-bottom: 10px;
+    margin: 10px 0 10px 0;
+    padding: 2px 6px 2px 6px;
   }
 
   & .cardsLeft {
     color: #f2f2f2;
     padding-top: 17px;
     text-align: center;
-  }
-
-  & .isTurn {
-    background-color: #f2f2f2;
-    border-radius: 5px;
-    color: black;
-    padding: 2px 6px 2px 6px;
-    border: 3px solid blue;
   }
 
   & .disconnected {
@@ -104,14 +148,20 @@ export default Vue.extend({
     height: 100%;
   }
 
-  .nameAndCard {
+  .player {
     flex-direction: row;
     justify-content: space-between;
+
+    & .nameBar {
+      & .block {
+        width: 20px;
+        height: 20px;
+      }
+    }
 
     & h3 {
       margin: 0;
       font-size: 1em;
-      padding: 2px 6px 2px 6px;
     }
 
     & .cardsLeft {

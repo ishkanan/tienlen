@@ -8,9 +8,9 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import Toaster from '~/components/Toaster.vue';
 import GameTable from '~/views/GameTable.vue';
 import Intro from '~/views/Intro.vue';
+import Toaster from '~/views/Toaster.vue';
 import { game, ConnectionState } from '~/store/game';
 
 export default Vue.extend({
