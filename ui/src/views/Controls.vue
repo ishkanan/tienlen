@@ -31,14 +31,24 @@ export default Vue.extend({
   },
 
   computed: {
+    deltas(): Record<number, number> {
+      if (game.isInProgress) return {};
+      return game.winPlaces.reduce<Record<number, number>>((memo, player, i) => {
+        memo[player.position] = game.opponents.length - i;
+        return memo;
+      }, {});
+    },
     scores(): ScoreLine[] {
       const selfScore = {
         playerName: game.self?.name || 'YOU',
         score: game.self?.score || 0,
+        delta: (game.self && this.deltas[game.self.position]) || 0,
       };
+      console.log(this.deltas);
       return game.opponents.map(o => ({
         playerName: o.name,
         score: o.score,
+        delta: this.deltas[o.position] || 0,
       })).concat(selfScore);
     },
     gameState(): GameState {

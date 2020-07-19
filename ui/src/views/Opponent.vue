@@ -8,7 +8,13 @@
         <ds-block-icon v-if="passed" :class="$style.block"/>
         <h3 :class="{ [$style.isTurn]: opponent.isTurn }">{{ opponent.name }}</h3>
       </span>
+
       <div v-if="!opponent.connected" :class="$style.disconnected"/>
+
+      <div v-else-if="winPlace > 0" :class="$style.placed">
+        <h2 :class="$style.note">{{ ordinalisedWinPlace }}</h2>
+      </div>
+
       <ds-card
         v-else
         :card="unfaced"
@@ -16,7 +22,7 @@
         :show-face="false"
       >
         <template v-slot:info>
-          <h1 v-if="opponent.cardsLeft > 0" :class="$style.cardsLeft">
+          <h1 v-if="opponent.cardsLeft > 0" :class="$style.note">
             x {{ opponent.cardsLeft }}
           </h1>
         </template>
@@ -30,7 +36,7 @@ import Vue from 'vue';
 import BlockIcon from '~/components/BlockIcon.vue';
 import CardView from '~/components/Card.vue';
 import { Card, Player, Suit } from '~/lib/models';
-import { setTitle } from '~/lib/utils';
+import { ordinalise, setTitle } from '~/lib/utils';
 import { game } from '~/store/game';
 
 export default Vue.extend({
@@ -54,6 +60,13 @@ export default Vue.extend({
         globalRank: 52,
         suitRank: 13,
       };
+    },
+    winPlace(): number {
+      const placed = game.winPlaces.findIndex(p => p.position === this.position);
+      return placed === -1 ? 0 : placed + 1;
+    },
+    ordinalisedWinPlace(): string {
+      return ordinalise(this.winPlace);
     },
     opponent(): Player | undefined {
       return game.opponents.find(c => c.position === this.position);
@@ -127,7 +140,7 @@ export default Vue.extend({
     padding: 2px 6px 2px 6px;
   }
 
-  & .cardsLeft {
+  & .note {
     color: #f2f2f2;
     padding-top: 17px;
     text-align: center;
@@ -139,6 +152,23 @@ export default Vue.extend({
     background: url(../assets/images/disconnected.png);
     background-size: cover;
     background-repeat: no-repeat;
+  }
+
+  & .placed {
+    width: 100px;
+    height: 120px;
+    background: url(../assets/images/trophy.png);
+    background-size: cover;
+    background-repeat: no-repeat;
+
+    & .note {
+      background-color: black;
+      border-radius: 5px;
+      color: #f2f2f2;
+      padding: 0px;
+      width: 60%;
+      margin: 40px auto auto auto;
+    }
   }
 }
 
@@ -164,7 +194,7 @@ export default Vue.extend({
       font-size: 1em;
     }
 
-    & .cardsLeft {
+    & .note {
       font-size: 1.1em;
       padding-top: 6px;
     }
@@ -172,6 +202,11 @@ export default Vue.extend({
     & .disconnected {
       width: 50px;
       height: 50px;
+    }
+
+    & .placed {
+      width: 60px;
+      height: 75px;
     }
   }
 }

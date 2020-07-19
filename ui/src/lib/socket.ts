@@ -73,6 +73,7 @@ const actions: Record<string, any> = {
   'TURN_PASSED': game.turnPassed,
   'ROUND_WON': game.roundWon,
   'TURN_PLAYED': game.turnPlayed,
+  "PLAYER_PLACED": game.playerPlaced,
   'GAME_WON': game.gameWon,
   'GAME_STATE_REFRESH': game.gameStateRefresh,
   'ERROR': game.actionError,

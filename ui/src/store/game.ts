@@ -10,11 +10,13 @@ import {
   GameWonResponse,
   PlayerDisconnectedResponse,
   PlayerJoinedResponse,
+  PlayerPlacedResponse,
   RoundWonResponse,
   TurnPassedResponse,
   TurnPlayedResponse,
 } from '~/lib/messages';
 import { Card, GameEvent, GameEventKind, Player } from '~/lib/models';
+import { ordinalise } from '~/lib/utils';
 import store from '~/store';
 
 export enum ConnectionState {
@@ -35,6 +37,7 @@ class Game extends VuexModule {
   lastPlayed: Card[] = [];
   firstRound = true;
   newRound = true;
+  winPlaces: Player[] = [];
 
   private errorMap = {
     [ErrorKind.LobbyNotReady]: 'Game is not ready to start yet.',
@@ -77,6 +80,14 @@ class Game extends VuexModule {
       message: 'You were disconnected from the game.',
     });
     this.connState = ConnectionState.NotConnected;
+    this.opponents = [];
+    this.self = undefined;
+    this.selfHand = [];
+    this.gameState = GameState.InLobby;
+    this.lastPlayed = [];
+    this.firstRound = true;
+    this.newRound = true;
+    this.winPlaces = [];
   }
 
   @Action
@@ -120,6 +131,14 @@ class Game extends VuexModule {
   }
 
   @Action
+  playerPlaced({ response }: { response: PlayerPlacedResponse }) {
+    this.events.push({
+      kind: GameEventKind.Info,
+      message: `${response.player.name} has no more cards and got ${ordinalise(response.place)} place.`,
+    });
+  }
+
+  @Action
   roundWon({ response }: { response: RoundWonResponse }) {
     this.events.push({
       kind: GameEventKind.Info,
@@ -153,6 +172,7 @@ class Game extends VuexModule {
     this.lastPlayed = response.lastPlayed;
     this.firstRound = response.firstRound;
     this.newRound = response.newRound;
+    this.winPlaces = response.winPlaces;
   }
 
   @Action

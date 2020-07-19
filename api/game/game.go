@@ -28,13 +28,15 @@ type context struct {
 
 // Game encapsulates the core game logic and high-level comms to players
 type Game struct {
-	players     players
-	state       gameState
-	lastPlayed  []card
-	firstRound  bool
-	newRound    bool
-	connections map[string]context
-	mutex       *sync.Mutex
+	players                 players
+	state                   gameState
+	lastPlayed              []card
+	firstRound              bool
+	newRound                bool
+	connections             map[string]context
+	mutex                   *sync.Mutex
+	winPlaces               players
+	nextPositionIfNotStolen int
 }
 
 // NewGame builds a new game instance and calls Init()
@@ -51,6 +53,8 @@ func (g *Game) Init() {
 	g.lastPlayed = nil
 	g.connections = map[string]context{}
 	g.mutex = &sync.Mutex{}
+	g.winPlaces = make(players, 0, 3)
+	g.nextPositionIfNotStolen = 0
 }
 
 // IsAcceptingConnections indicates if the game can accept more player connections
@@ -97,7 +101,7 @@ func (g *Game) ConnectionStateChanged(connUUID uuid.UUID, conn IMessageSink, sta
 			utils.LogInfo("ConnectionStateChanged: Game is paused due to player disconnect")
 		}
 	} else {
-		utils.LogDebug("ProcessRequest: %s has disconnected", connID)
+		utils.LogDebug("ConnectionStateChanged: %s has disconnected", connID)
 	}
 	delete(g.connections, connID)
 
@@ -188,6 +192,7 @@ func (g *Game) processJoinGameRequest(connID string, req joinGameRequest) {
 		}
 		g.players = append(g.players, thePlayer)
 		g.players.ResetAllGameStatuses()
+		g.players.ResetScores()
 	}
 
 	thePlayer.Connected = true
@@ -231,6 +236,8 @@ func (g *Game) processStartGameRequest(connID string) {
 	g.state = gameStateRunning
 	g.firstRound = true
 	g.newRound = true
+	g.winPlaces = make(players, 0, 3)
+	g.nextPositionIfNotStolen = 0
 
 	g.sendStateToAllPlayers()
 	g.sendToAllPlayers(gameStartedResponse{Player: *thePlayer})
@@ -246,18 +253,32 @@ func (g *Game) processTurnPassRequest(connID string) {
 		return
 	}
 
+	utils.LogInfo("processTurnPassRequest: %s has passed their turn", thePlayer.Name)
+
 	thePlayer.IsPassed = true
 	thePlayer.IsTurn = false
 	nextPlayer := g.players.NextTurn(thePlayer)
 	nextPlayer.IsTurn = true
 
-	// if only one player left who hasn't passed, start new round
-	if g.players.NextTurn(nextPlayer).Name == nextPlayer.Name {
+	if g.players.PassedAndPlacedCount() == len(g.players) {
+		// no-one beat cards of most recent placed player, so start new round
+		for _, player := range g.players {
+			player.IsPassed = false
+		}
+		nextPlayer.IsTurn = false
+		nextPlayer = g.players.AtPosition(g.nextPositionIfNotStolen)
+		nextPlayer.IsTurn = true
+		g.lastPlayed = nil
+		g.newRound = true
+		g.nextPositionIfNotStolen = 0
+	} else if g.players.NextTurn(nextPlayer).Position == nextPlayer.Position && g.nextPositionIfNotStolen == 0 {
+		// only 1 player left who hasn't passed, so start new round
 		for _, player := range g.players {
 			player.IsPassed = false
 		}
 		g.lastPlayed = nil
 		g.newRound = true
+		g.nextPositionIfNotStolen = 0
 	}
 
 	g.sendStateToAllPlayers()
@@ -304,7 +325,7 @@ func (g *Game) processTurnPlayRequest(connID string, req turnPlayRequest) {
 			errKindInvalidCards:   "invalid cards",
 			errKindInvalidPattern: "invalid pattern",
 			errKindCardsNotBetter: "cards not better than last played",
-			errKindMustPlayLowest: "must played lowest",
+			errKindMustPlayLowest: "must play lowest",
 		}[err]
 		g.sendOnConnection(connID, errorResponse{Kind: err})
 		utils.LogDebug("processTurnPlayRequest: Rejected proposed cards from %s - %s", thePlayer.Name, msg)
@@ -316,15 +337,35 @@ func (g *Game) processTurnPlayRequest(connID string, req turnPlayRequest) {
 	thePlayer.IsTurn = false
 	g.firstRound = false
 	g.lastPlayed = cardsToPlay
-	g.newRound = false
-	g.players.NextTurn(thePlayer).IsTurn = len(newHand) > 0
+	g.newRound = len(g.players)-g.players.PassedAndPlacedCount() == 1
+	g.players.NextTurn(thePlayer).IsTurn = true
 	g.players.SetLastPlayed(*thePlayer)
+	g.nextPositionIfNotStolen = 0
+
+	// win logic block handles player ranking/placement
 	won := len(thePlayer.Hand) == 0 || (determinePattern(cardsToPlay) == patternQuad && cardsToPlay[0].FaceValue == 2)
 	if won {
-		g.state = gameStateInLobby
-		g.players.ResetAllGameStatuses()
-		thePlayer.Score++
-		thePlayer.WonLastGame = true
+		g.winPlaces = append(g.winPlaces, thePlayer)
+
+		if len(g.winPlaces) == len(g.players)-1 {
+			// all possible players have secured a place
+			g.state = gameStateInLobby
+			g.players.ResetAllGameStatuses()
+			g.winPlaces[0].WonLastGame = true
+			for i, player := range g.winPlaces {
+				player.Score += len(g.players) - 1 - i
+			}
+		} else {
+			// there are still some players to secure a place (i.e. 3-4 player game)
+			g.nextPositionIfNotStolen = (thePlayer.Position % len(g.players)) + 1
+		}
+	}
+
+	if g.newRound {
+		for _, player := range g.players {
+			player.IsPassed = false
+		}
+		g.lastPlayed = nil
 	}
 
 	g.sendStateToAllPlayers()
@@ -335,8 +376,16 @@ func (g *Game) processTurnPlayRequest(connID string, req turnPlayRequest) {
 	utils.LogInfo("processTurnPlayRequest: %s played %+v", thePlayer.Name, cardsToPlay)
 
 	if won {
-		g.sendToAllPlayers(gameWonResponse{Player: *thePlayer})
-		utils.LogInfo("processTurnPlayRequest: %s has won the game", thePlayer.Name)
+		g.sendToAllPlayers(playerPlacedResponse{Player: *thePlayer, Place: len(g.winPlaces)})
+		utils.LogInfo("processTurnPlayRequest: %s has played all their cards and got %s place", thePlayer.Name, utils.Ordinal(len(g.winPlaces)))
+	} else if g.newRound {
+		utils.LogInfo("processTurnPlayRequest: %s has won the round", thePlayer.Name)
+		g.sendToAllPlayers(roundWonResponse{Player: *thePlayer})
+	}
+
+	if g.state == gameStateInLobby {
+		g.sendToAllPlayers(gameWonResponse{Player: *g.winPlaces[0]})
+		utils.LogInfo("processTurnPlayRequest: %s has won the game", g.winPlaces[0].Name)
 	}
 }
 
@@ -382,8 +431,13 @@ func (g Game) sendOnConnection(connID string, response interface{}) {
 
 // sends a customised gameStateRefreshResponse to each player
 func (g Game) sendStateToAllPlayers() {
+	winPlaces := make([]player, 0, 3)
+	for _, player := range g.winPlaces {
+		winPlaces = append(winPlaces, *player)
+	}
+
 	for _, context := range g.connections {
-		opponents := []player{}
+		opponents := make([]player, 0, 3)
 		for _, player := range g.players {
 			if player.Name != context.Player.Name {
 				opponents = append(opponents, *player)
@@ -398,6 +452,7 @@ func (g Game) sendStateToAllPlayers() {
 			LastPlayed: g.lastPlayed,
 			FirstRound: g.firstRound,
 			NewRound:   g.newRound,
+			WinPlaces:  winPlaces,
 		})
 	}
 }
