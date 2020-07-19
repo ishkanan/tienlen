@@ -60,7 +60,13 @@ type turnPlayedResponse struct {
 	Cards  []card `json:"cards"`
 }
 
-// informs all players of the winner of the game
+// informs all players of a placed win
+type playerPlacedResponse struct {
+	Player player `json:"player"`
+	Place  int    `json:"place"`
+}
+
+// informs all players of the winner (1st place) of the game
 type gameWonResponse struct {
 	Player player `json:"player"`
 }
@@ -74,6 +80,7 @@ type gameStateRefreshResponse struct {
 	LastPlayed []card    `json:"lastPlayed"`
 	FirstRound bool      `json:"firstRound"`
 	NewRound   bool      `json:"newRound"`
+	WinPlaces  []player  `json:"winPlaces"`
 }
 
 type errorKind int

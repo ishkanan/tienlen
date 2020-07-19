@@ -7,7 +7,8 @@
         :class="$style.scoreLine"
       >
         <h2>{{ scoreLine.playerName }}</h2>
-        <h2>{{ scoreLine.score }}</h2>
+        <h2 v-if="scoreLine.delta > 0">{{ scoreLine.score }} (+{{ scoreLine.delta }})</h2>
+        <h2 v-else>{{ scoreLine.score }}</h2>
       </div>
       <button @click="onClose">Close</button>
     </div>
@@ -21,6 +22,7 @@ import { sortBy } from 'lodash-es';
 export interface ScoreLine {
   playerName: string;
   score: number;
+  delta: number;
 }
 
 export default Vue.extend({

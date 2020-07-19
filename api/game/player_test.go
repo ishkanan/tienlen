@@ -19,15 +19,28 @@ func TestNextAvailablePosition(t *testing.T) {
 	assert.Equal(t, 0, p.NextAvailablePosition())
 }
 
-func TestNextTurn(t *testing.T) {
+func TestNextTurnNoWins(t *testing.T) {
 	p := players{
-		&player{Position: 1},
-		&player{Position: 2},
-		&player{Position: 3, IsPassed: true},
-		&player{Position: 4},
+		&player{Position: 1, Hand: []card{card{}}},
+		&player{Position: 2, Hand: []card{card{}}},
+		&player{Position: 3, Hand: []card{card{}}, IsPassed: true},
+		&player{Position: 4, Hand: []card{card{}}},
 	}
 	assert.Equal(t, 2, p.NextTurn(p[0]).Position)
 	assert.Equal(t, 4, p.NextTurn(p[1]).Position)
+	assert.Equal(t, 4, p.NextTurn(p[2]).Position)
 	assert.Equal(t, 1, p.NextTurn(p[3]).Position)
-	assert.Equal(t, 2, p.NextTurn(p[0]).Position)
+}
+
+func TestNextTurnOneWinner(t *testing.T) {
+	p := players{
+		&player{Position: 1, Hand: []card{card{}}},
+		&player{Position: 2, Hand: []card{}},
+		&player{Position: 3, Hand: []card{card{}}, IsPassed: true},
+		&player{Position: 4, Hand: []card{card{}}},
+	}
+	assert.Equal(t, 4, p.NextTurn(p[0]).Position)
+	assert.Equal(t, 4, p.NextTurn(p[1]).Position)
+	assert.Equal(t, 4, p.NextTurn(p[2]).Position)
+	assert.Equal(t, 1, p.NextTurn(p[3]).Position)
 }

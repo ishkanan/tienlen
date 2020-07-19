@@ -46,6 +46,11 @@ export interface TurnPlayedResponse {
   cards: Card[];
 }
 
+export interface PlayerPlacedResponse {
+  player: Player;
+  place: number;
+}
+
 export interface GameWonResponse {
   player: Player;
 }
@@ -64,6 +69,7 @@ export interface GameStateRefreshResponse {
   lastPlayed: Card[];
   firstRound: boolean;
   newRound: boolean;
+  winPlaces: Player[];
 }
 
 export enum ErrorKind {

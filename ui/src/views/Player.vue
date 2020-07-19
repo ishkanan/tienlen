@@ -8,14 +8,20 @@
       <button v-if="canPlay" @click="doPlay">Play cards</button>
       <button v-if="canPass" class="danger" @click="doPass">Pass turn</button>
       <h2 v-if="waiting">Waiting for turn...</h2>
+      <h2 v-if="winPlace > 0 && !canStart">All done bucko! Have a break.</h2>
     </div>
 
     <div :class="$style.hand">
+      <div v-if="winPlace > 0" :class="$style.placed">
+        <h2 :class="$style.note">{{ ordinalisedWinPlace }}</h2>
+      </div>
+
       <ds-hand
-        v-if="showHand"
+        v-else-if="showHand"
         :cards="hand"
         @selected="onSelected"
       />
+
       <ds-card
         v-else
         :class="$style.unfaced"
@@ -38,7 +44,7 @@ import BlockIcon from '~/components/BlockIcon.vue';
 import CardView from '~/components/Card.vue';
 import Hand from '~/components/Hand.vue';
 import { Card, Player, Suit } from '~/lib/models';
-import { startFlashTitle } from '~/lib/utils';
+import { ordinalise, startFlashTitle } from '~/lib/utils';
 import { requestStartGame, requestTurnPass, requestTurnPlay } from '~/lib/socket';
 import { game } from '~/store/game';
 
@@ -63,7 +69,15 @@ export default Vue.extend({
     waiting(): boolean {
       return game.isInProgress &&
         !!this.player &&
-        !this.player.isTurn;
+        !this.player.isTurn &&
+        this.winPlace === 0;
+    },
+    winPlace(): number {
+      const placed = game.winPlaces.findIndex(p => p.position === game.self?.position);
+      return placed === -1 ? 0 : placed + 1;
+    },
+    ordinalisedWinPlace(): string {
+      return ordinalise(this.winPlace);
     },
     canStart(): boolean {
       return !game.isInProgress &&
@@ -84,7 +98,8 @@ export default Vue.extend({
         this.player.isTurn;
     },
     showHand(): boolean {
-      return game.isInProgress;
+      return game.isInProgress &&
+        this.winPlace === 0;
     },
     player(): Player | undefined {
       return game.self;
@@ -180,6 +195,25 @@ export default Vue.extend({
   flex-direction: row;
   justify-content: center;
 
+  & .placed {
+    width: 100px;
+    height: 120px;
+    background: url(../assets/images/trophy.png);
+    background-size: cover;
+    background-repeat: no-repeat;
+    margin-top: 40px;
+    text-align: center;
+
+    & .note {
+      background-color: black;
+      border-radius: 5px;
+      color: #f2f2f2;
+      padding: 0px;
+      width: 60%;
+      margin: 40px auto auto auto;
+    }
+  }
+
   & .unfaced {
     margin-top: 40px;
   }
@@ -234,6 +268,15 @@ export default Vue.extend({
   .hand {
     margin-top: 15px;
 
+    & .placed {
+      width: 60px;
+      height: 75px;
+
+      & .note {
+        margin-top: 25px;
+      }
+    }
+
     & .unfaced {
       margin-top: 30px;
     }
@@ -248,6 +291,11 @@ export default Vue.extend({
     & h3 {
       font-size: 1em;
     }
+  }
+
+  .note {
+    font-size: 1.1em;
+    padding-top: 6px;
   }
 }
 </style>

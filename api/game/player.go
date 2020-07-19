@@ -44,6 +44,17 @@ func (p players) DeleteByName(name string) players {
 	return kept
 }
 
+// PassedAndPlacedCount returns the number of players who have passed or been placed
+func (p players) PassedAndPlacedCount() int {
+	count := 0
+	for _, player := range p {
+		if player.CardsLeft == 0 || player.IsPassed {
+			count++
+		}
+	}
+	return count
+}
+
 // WithLowestCard returns the player with the lowest value card
 func (p players) WithLowestCard() *player {
 	lowestIndex := 0
@@ -87,12 +98,12 @@ func (p players) AtPosition(position int) *player {
 	return nil
 }
 
-// NextTurn returns the next player who can play a hand or pass
+// NextTurn returns the next player who can play cards or pass
 func (p players) NextTurn(after *player) *player {
 	nextPosition := (after.Position % len(p)) + 1
 	for {
 		nextPlayer := p.AtPosition(nextPosition)
-		if !nextPlayer.IsPassed {
+		if !nextPlayer.IsPassed && len(nextPlayer.Hand) > 0 {
 			return nextPlayer
 		}
 		nextPosition = (nextPosition % len(p)) + 1

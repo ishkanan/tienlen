@@ -97,6 +97,7 @@ func responseMap() map[reflect.Type]string {
 		reflect.TypeOf(turnPassedResponse{}):         "TURN_PASSED",
 		reflect.TypeOf(roundWonResponse{}):           "ROUND_WON",
 		reflect.TypeOf(turnPlayedResponse{}):         "TURN_PLAYED",
+		reflect.TypeOf(playerPlacedResponse{}):       "PLAYER_PLACED",
 		reflect.TypeOf(gameWonResponse{}):            "GAME_WON",
 		reflect.TypeOf(gameStateRefreshResponse{}):   "GAME_STATE_REFRESH",
 		reflect.TypeOf(errorResponse{}):              "ERROR",
