@@ -73,14 +73,15 @@ type gameWonResponse struct {
 
 // provides all players with a full game state refresh
 type gameStateRefreshResponse struct {
-	Opponents  []player  `json:"opponents"`
-	Self       player    `json:"self"`
-	SelfHand   []card    `json:"selfHand"`
-	GameState  gameState `json:"gameState"`
-	LastPlayed []card    `json:"lastPlayed"`
-	FirstRound bool      `json:"firstRound"`
-	NewRound   bool      `json:"newRound"`
-	WinPlaces  []player  `json:"winPlaces"`
+	Opponents      []player  `json:"opponents"`
+	Self           player    `json:"self"`
+	SelfHand       []card    `json:"selfHand"`
+	GameState      gameState `json:"gameState"`
+	LastPlayed     []card    `json:"lastPlayed"`
+	FirstRound     bool      `json:"firstRound"`
+	NewRound       bool      `json:"newRound"`
+	WinPlaces      []player  `json:"winPlaces"`
+	ClockwiseTurns bool      `json:"clockwiseTurns"`
 }
 
 type errorKind int

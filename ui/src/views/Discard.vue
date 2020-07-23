@@ -10,6 +10,7 @@
     </template>
     <template v-else>
       <div :class="$style.messageAndLastPlayed">
+        <div v-if="!inLobby" :class="[$style.turnDirection, !clockwiseTurns && $style.invertedTurnDirection]"/>
         <h2 v-if="inLobby && previousWinner" :class="$style.message">
           {{ previousWinner.name }} won the game!
         </h2>
@@ -66,6 +67,9 @@ export default Vue.extend({
       if (game.self?.lastPlayed) return game.self;
       return game.opponents.find(o => o.lastPlayed);
     },
+    clockwiseTurns(): boolean {
+      return game.clockwiseTurns;
+    },
   },
 });
 </script>
@@ -80,6 +84,7 @@ export default Vue.extend({
   background-color: rgba(200, 200, 200, 0.4);
   border: black dashed 1px;
   border-radius: 10px;
+  position: relative;
 }
 
 .messageAndLastPlayed {
@@ -98,6 +103,21 @@ export default Vue.extend({
   flex-direction: row;
   align-items: center;
   justify-content: center;
+}
+
+.turnDirection {
+  width: 57px;
+  height: 45px;
+  background: url(../assets/images/turn-direction.png);
+  background-size: cover;
+  background-repeat: no-repeat;
+  position: absolute;
+  right: 1px;
+  top: 1px;
+}
+
+.invertedTurnDirection {
+  transform: scaleX(-1);
 }
 
 .winner {
@@ -124,6 +144,11 @@ export default Vue.extend({
     & h2 {
       font-size: 1.3em;
     }
+  }
+
+  .turnDirection {
+    width: 50px;
+    height: 38px;
   }
 }
 </style>
