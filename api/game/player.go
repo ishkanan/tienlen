@@ -141,11 +141,18 @@ func (p players) TheyWhoNotBeNamed() string {
 	}
 }
 
-// SetLastPlayed sets the last played flag on the designated player and unsets
-// it on the others
-func (p players) SetLastPlayed(to player) {
+// SetLastPlayed sets the last played flag on the designated player and clears
+// it on the others. If "to" is nil, flag is cleared on all players.
+func (p players) SetLastPlayed(to *player) {
 	for _, player := range p {
-		player.LastPlayed = player.Name == to.Name
+		player.LastPlayed = to != nil && player.Name == to.Name
+	}
+}
+
+// UnsetPassed unsets the passed flag on all players
+func (p players) UnsetPassed() {
+	for _, player := range p {
+		player.IsPassed = false
 	}
 }
 

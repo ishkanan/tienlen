@@ -44,3 +44,16 @@ func TestNextTurnOneWinner(t *testing.T) {
 	assert.Equal(t, 4, p.NextTurn(p[2]).Position)
 	assert.Equal(t, 1, p.NextTurn(p[3]).Position)
 }
+
+func TestNextTurnTwoWinners(t *testing.T) {
+	p := players{
+		&player{Position: 1, Hand: []card{}},
+		&player{Position: 2, Hand: []card{}},
+		&player{Position: 3, Hand: []card{card{}}},
+		&player{Position: 4, Hand: []card{card{}}},
+	}
+	assert.Equal(t, 3, p.NextTurn(p[0]).Position)
+	assert.Equal(t, 3, p.NextTurn(p[1]).Position)
+	assert.Equal(t, 4, p.NextTurn(p[2]).Position)
+	assert.Equal(t, 3, p.NextTurn(p[3]).Position)
+}
