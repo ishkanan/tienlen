@@ -21,6 +21,7 @@ const suitYmap: Record<Suit, number> = {
 
 interface Data {
   selected: boolean;
+  windowWidth: number;
 }
 
 export default Vue.extend({
@@ -42,20 +43,21 @@ export default Vue.extend({
   data(): Data {
     return {
       selected: false,
+      windowWidth: window.innerWidth,
     };
   },
 
   computed: {
     scaleFactor(): number {
-      return window.innerWidth < 1100 ? 2 : 1;
+      return this.windowWidth <= 1100 ? 0.75 : 1;
     },
     offsetX(): number {
       if (!this.showFace) return 0;
-      return (80 / this.scaleFactor) * this.card.faceValue;
+      return (80 * this.scaleFactor) * this.card.faceValue;
     },
     offsetY(): number {
-      if (!this.showFace) return [Suit.Spades, Suit.Clubs].includes(this.card.suit) ? 0 : 120 / this.scaleFactor;
-      return suitYmap[this.card.suit] / this.scaleFactor;
+      if (!this.showFace) return [Suit.Spades, Suit.Clubs].includes(this.card.suit) ? 0 : 120 * this.scaleFactor;
+      return suitYmap[this.card.suit] * this.scaleFactor;
     },
     style(): Record<string, unknown> {
       return {
@@ -65,11 +67,22 @@ export default Vue.extend({
     },
   },
 
+  beforeDestroy() {
+    window.removeEventListener('resize', this.handleWindowResize);
+  },
+
+  mounted() {
+    window.addEventListener('resize', this.handleWindowResize);
+  },
+
   methods: {
     onClick() {
       if (!this.selectable) return;
       this.selected = !this.selected;
       this.$emit('selected', this.selected);
+    },
+    handleWindowResize() {
+      this.windowWidth = window.innerWidth;
     },
   },
 });
@@ -84,9 +97,9 @@ export default Vue.extend({
 
 @media (max-width: 1100px) {
   .card {
-    width: 40px;
-    height: 60px;
-    background-size: 560px 240px;
+    width: 60px;
+    height: 90px;
+    background: url(../assets/images/cards-mobile.png);
   }
 }
 </style>
