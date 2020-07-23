@@ -28,15 +28,15 @@ type context struct {
 
 // Game encapsulates the core game logic and high-level comms to players
 type Game struct {
-	players                 players
-	state                   gameState
-	lastPlayed              []card
-	firstRound              bool
-	newRound                bool
-	connections             map[string]context
-	mutex                   *sync.Mutex
-	winPlaces               players
-	nextPositionIfNotStolen int
+	players     players
+	state       gameState
+	lastPlayed  []card
+	firstRound  bool
+	newRound    bool
+	connections map[string]context
+	mutex       *sync.Mutex
+	winPlaces   players
+	placedRound bool
 }
 
 // NewGame builds a new game instance and calls Init()
@@ -54,7 +54,7 @@ func (g *Game) Init() {
 	g.connections = map[string]context{}
 	g.mutex = &sync.Mutex{}
 	g.winPlaces = make(players, 0, 3)
-	g.nextPositionIfNotStolen = 0
+	g.placedRound = false
 }
 
 // IsAcceptingConnections indicates if the game can accept more player connections
@@ -232,12 +232,10 @@ func (g *Game) processStartGameRequest(connID string) {
 		first = g.players.WithLowestCard()
 	}
 	first.IsTurn = true
-	g.lastPlayed = nil
 	g.state = gameStateRunning
 	g.firstRound = true
-	g.newRound = true
 	g.winPlaces = make(players, 0, 3)
-	g.nextPositionIfNotStolen = 0
+	g.setNewRound()
 
 	g.sendStateToAllPlayers()
 	g.sendToAllPlayers(gameStartedResponse{Player: *thePlayer})
@@ -262,24 +260,13 @@ func (g *Game) processTurnPassRequest(connID string) {
 
 	if g.players.PassedAndPlacedCount() == len(g.players) {
 		// no-one beat cards of most recent placed player, so start new round
-		for _, player := range g.players {
-			player.IsPassed = false
-		}
+		g.setNewRound()
 		nextPlayer.IsTurn = false
-		nextPlayer = g.players.AtPosition(g.nextPositionIfNotStolen)
+		nextPlayer = g.players.NextTurn(nextPlayer)
 		nextPlayer.IsTurn = true
-		g.lastPlayed = nil
-		g.players.SetLastPlayed(*nextPlayer)
-		g.newRound = true
-		g.nextPositionIfNotStolen = 0
-	} else if g.players.NextTurn(nextPlayer).Position == nextPlayer.Position && g.nextPositionIfNotStolen == 0 {
+	} else if g.players.NextTurn(nextPlayer).Position == nextPlayer.Position && !g.placedRound {
 		// only 1 player left who hasn't passed, so start new round
-		for _, player := range g.players {
-			player.IsPassed = false
-		}
-		g.lastPlayed = nil
-		g.newRound = true
-		g.nextPositionIfNotStolen = 0
+		g.setNewRound()
 	}
 
 	g.sendStateToAllPlayers()
@@ -338,15 +325,15 @@ func (g *Game) processTurnPlayRequest(connID string, req turnPlayRequest) {
 	thePlayer.IsTurn = false
 	g.firstRound = false
 	g.lastPlayed = cardsToPlay
-	g.newRound = len(g.players)-g.players.PassedAndPlacedCount() == 1
 	g.players.NextTurn(thePlayer).IsTurn = true
-	g.players.SetLastPlayed(*thePlayer)
-	g.nextPositionIfNotStolen = 0
+	g.players.SetLastPlayed(thePlayer)
+	g.placedRound = false
+	g.newRound = false
 
-	// win logic block handles player ranking/placement
-	won := len(thePlayer.Hand) == 0 || (determinePattern(cardsToPlay) == patternQuad && cardsToPlay[0].FaceValue == 2)
-	if won {
+	placed := len(thePlayer.Hand) == 0 || (determinePattern(cardsToPlay) == patternQuad && cardsToPlay[0].FaceValue == 2)
+	if placed {
 		g.winPlaces = append(g.winPlaces, thePlayer)
+		g.placedRound = true
 
 		if len(g.winPlaces) == len(g.players)-1 {
 			// all possible players have secured a place
@@ -358,15 +345,18 @@ func (g *Game) processTurnPlayRequest(connID string, req turnPlayRequest) {
 			}
 		} else {
 			// there are still some players to secure a place (i.e. 3-4 player game)
-			g.nextPositionIfNotStolen = (thePlayer.Position % len(g.players)) + 1
+			if g.players.PassedAndPlacedCount() == len(g.players) {
+				// the player who just placed was the last non-passed player,
+				// so we start a new round for the next player
+				g.setNewRound()
+				thePlayer.IsTurn = false
+				g.players.NextTurn(thePlayer).IsTurn = true
+			}
 		}
 	}
 
-	if g.newRound {
-		for _, player := range g.players {
-			player.IsPassed = false
-		}
-		g.lastPlayed = nil
+	if len(g.players)-g.players.PassedAndPlacedCount() == 1 {
+		g.setNewRound()
 	}
 
 	g.sendStateToAllPlayers()
@@ -376,7 +366,7 @@ func (g *Game) processTurnPlayRequest(connID string, req turnPlayRequest) {
 	})
 	utils.LogInfo("processTurnPlayRequest: %s played %+v", thePlayer.Name, cardsToPlay)
 
-	if won {
+	if placed {
 		g.sendToAllPlayers(playerPlacedResponse{Player: *thePlayer, Place: len(g.winPlaces)})
 		utils.LogInfo("processTurnPlayRequest: %s has played all their cards and got %s place", thePlayer.Name, utils.Ordinal(len(g.winPlaces)))
 	} else if g.newRound {
@@ -456,4 +446,13 @@ func (g Game) sendStateToAllPlayers() {
 			WinPlaces:  winPlaces,
 		})
 	}
+}
+
+// starts a new mid-game round
+func (g *Game) setNewRound() {
+	g.lastPlayed = nil
+	g.newRound = true
+	g.placedRound = false
+	g.players.SetLastPlayed(nil)
+	g.players.UnsetPassed()
 }
