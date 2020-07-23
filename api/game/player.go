@@ -99,24 +99,14 @@ func (p players) AtPosition(position int) *player {
 }
 
 // NextTurn returns the next player who can play cards or pass
-func (p players) NextTurn(after *player, clockwise bool) *player {
-	nextFunc := func(after int) int { return (after % len(p)) + 1 }
-	if !clockwise {
-		nextFunc = func(after int) int {
-			if after == 1 {
-				return len(p)
-			}
-			return after - 1
-		}
-	}
-
-	nextPosition := nextFunc(after.Position)
+func (p players) NextTurn(after *player) *player {
+	nextPosition := (after.Position % len(p)) + 1
 	for {
 		nextPlayer := p.AtPosition(nextPosition)
 		if !nextPlayer.IsPassed && len(nextPlayer.Hand) > 0 {
 			return nextPlayer
 		}
-		nextPosition = nextFunc(nextPosition)
+		nextPosition = (nextPosition % len(p)) + 1
 		if nextPosition == after.Position {
 			// we've looped back around to the same player
 			return after

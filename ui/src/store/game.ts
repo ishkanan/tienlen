@@ -38,7 +38,6 @@ class Game extends VuexModule {
   firstRound = true;
   newRound = true;
   winPlaces: Player[] = [];
-  clockwiseTurns = true;
 
   private errorMap = {
     [ErrorKind.LobbyNotReady]: 'Game is not ready to start yet.',
@@ -89,7 +88,6 @@ class Game extends VuexModule {
     this.firstRound = true;
     this.newRound = true;
     this.winPlaces = [];
-    this.clockwiseTurns = true;
   }
 
   @Action
@@ -175,7 +173,6 @@ class Game extends VuexModule {
     this.firstRound = response.firstRound;
     this.newRound = response.newRound;
     this.winPlaces = response.winPlaces;
-    this.clockwiseTurns = response.clockwiseTurns;
   }
 
   @Action

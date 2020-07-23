@@ -37,7 +37,6 @@ type Game struct {
 	mutex                   *sync.Mutex
 	winPlaces               players
 	nextPositionIfNotStolen int
-	clockwiseTurns          bool
 }
 
 // NewGame builds a new game instance and calls Init()
@@ -56,7 +55,6 @@ func (g *Game) Init() {
 	g.mutex = &sync.Mutex{}
 	g.winPlaces = make(players, 0, 3)
 	g.nextPositionIfNotStolen = 0
-	g.clockwiseTurns = false
 }
 
 // IsAcceptingConnections indicates if the game can accept more player connections
@@ -195,7 +193,6 @@ func (g *Game) processJoinGameRequest(connID string, req joinGameRequest) {
 		g.players = append(g.players, thePlayer)
 		g.players.ResetAllGameStatuses()
 		g.players.ResetScores()
-		g.winPlaces = make(players, 0, 3)
 	}
 
 	thePlayer.Connected = true
@@ -241,7 +238,6 @@ func (g *Game) processStartGameRequest(connID string) {
 	g.newRound = true
 	g.winPlaces = make(players, 0, 3)
 	g.nextPositionIfNotStolen = 0
-	g.clockwiseTurns = !g.clockwiseTurns
 
 	g.sendStateToAllPlayers()
 	g.sendToAllPlayers(gameStartedResponse{Player: *thePlayer})
@@ -261,7 +257,7 @@ func (g *Game) processTurnPassRequest(connID string) {
 
 	thePlayer.IsPassed = true
 	thePlayer.IsTurn = false
-	nextPlayer := g.players.NextTurn(thePlayer, g.clockwiseTurns)
+	nextPlayer := g.players.NextTurn(thePlayer)
 	nextPlayer.IsTurn = true
 
 	if g.players.PassedAndPlacedCount() == len(g.players) {
@@ -276,7 +272,7 @@ func (g *Game) processTurnPassRequest(connID string) {
 		g.players.SetLastPlayed(*nextPlayer)
 		g.newRound = true
 		g.nextPositionIfNotStolen = 0
-	} else if g.players.NextTurn(nextPlayer, g.clockwiseTurns).Position == nextPlayer.Position && g.nextPositionIfNotStolen == 0 {
+	} else if g.players.NextTurn(nextPlayer).Position == nextPlayer.Position && g.nextPositionIfNotStolen == 0 {
 		// only 1 player left who hasn't passed, so start new round
 		for _, player := range g.players {
 			player.IsPassed = false
@@ -343,7 +339,7 @@ func (g *Game) processTurnPlayRequest(connID string, req turnPlayRequest) {
 	g.firstRound = false
 	g.lastPlayed = cardsToPlay
 	g.newRound = len(g.players)-g.players.PassedAndPlacedCount() == 1
-	g.players.NextTurn(thePlayer, g.clockwiseTurns).IsTurn = true
+	g.players.NextTurn(thePlayer).IsTurn = true
 	g.players.SetLastPlayed(*thePlayer)
 	g.nextPositionIfNotStolen = 0
 
@@ -450,15 +446,14 @@ func (g Game) sendStateToAllPlayers() {
 		}
 
 		context.Connection.Send(gameStateRefreshResponse{
-			Opponents:      opponents,
-			Self:           *context.Player,
-			SelfHand:       context.Player.Hand,
-			GameState:      g.state,
-			LastPlayed:     g.lastPlayed,
-			FirstRound:     g.firstRound,
-			NewRound:       g.newRound,
-			WinPlaces:      winPlaces,
-			ClockwiseTurns: g.clockwiseTurns,
+			Opponents:  opponents,
+			Self:       *context.Player,
+			SelfHand:   context.Player.Hand,
+			GameState:  g.state,
+			LastPlayed: g.lastPlayed,
+			FirstRound: g.firstRound,
+			NewRound:   g.newRound,
+			WinPlaces:  winPlaces,
 		})
 	}
 }

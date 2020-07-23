@@ -70,7 +70,6 @@ export interface GameStateRefreshResponse {
   firstRound: boolean;
   newRound: boolean;
   winPlaces: Player[];
-  clockwiseTurns: boolean;
 }
 
 export enum ErrorKind {
