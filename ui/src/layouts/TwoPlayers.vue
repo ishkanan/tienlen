@@ -57,7 +57,7 @@ export default Vue.extend({});
   }
 
   .opponent1 {
-    grid-area: 1 / 3 / 3 / 9;
+    grid-area: 2 / 3 / 3 / 9;
     margin-top: 10px;
   }
 

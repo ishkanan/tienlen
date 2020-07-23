@@ -17,6 +17,7 @@
 
       <ds-card
         v-else
+        :class="$style.notMobile"
         :card="unfaced"
         :selectable="false"
         :show-face="false"
@@ -27,6 +28,10 @@
           </h1>
         </template>
       </ds-card>
+
+      <h1 v-if="opponent.cardsLeft > 0" :class="[$style.note, $style.mobile]">
+        x {{ opponent.cardsLeft }}
+      </h1>
     </div>
   </div>
 </template>
@@ -112,6 +117,14 @@ export default Vue.extend({
   align-items: center;
   justify-content: center;
 
+  & .mobile {
+    display: none;
+  }
+
+  & .notMobile {
+    display: block;
+  }
+
   & .nameBar {
     display: flex;
     flex-direction: row;
@@ -182,6 +195,14 @@ export default Vue.extend({
     flex-direction: row;
     justify-content: space-between;
 
+    & .mobile {
+      display: block;
+    }
+
+    & .notMobile {
+      display: none;
+    }
+
     & .nameBar {
       & .block {
         width: 20px;
@@ -191,22 +212,22 @@ export default Vue.extend({
 
     & h3 {
       margin: 0;
-      font-size: 1em;
+      font-size: 1.1em;
     }
 
     & .note {
-      font-size: 1.1em;
-      padding-top: 6px;
+      font-size: 1.3em;
+      padding-top: 0px;
     }
 
     & .disconnected {
-      width: 50px;
-      height: 50px;
+      width: 35px;
+      height: 35px;
     }
 
     & .placed {
-      width: 60px;
-      height: 75px;
+      width: 30px;
+      height: 38px;
     }
   }
 }

@@ -60,20 +60,20 @@ export default Vue.extend({});
   }
 
   .player {
-    grid-area: 10 / 1 / 14 / 11;
+    grid-area: 9 / 1 / 13 / 11;
   }
 
   .opponent1 {
-    grid-area: 1 / 3 / 3 / 9;
+    grid-area: 2 / 3 / 3 / 9;
     margin-top: 10px;
   }
 
   .opponent2 {
-    grid-area: 3 / 3 / 5 / 9;
+    grid-area: 3 / 3 / 4 / 9;
   }
 
   .discard {
-    grid-area: 5 / 1 / 9 / 11;
+    grid-area: 4 / 1 / 8 / 11;
   }
 
   .controls {

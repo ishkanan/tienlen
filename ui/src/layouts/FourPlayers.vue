@@ -67,24 +67,24 @@ export default Vue.extend({});
   }
 
   .player {
-    grid-area: 12 / 1 / 16 / 11;
+    grid-area: 10 / 1 / 14 / 11;
   }
 
   .opponent1 {
-    grid-area: 1 / 3 / 3 / 9;
+    grid-area: 2 / 3 / 3 / 9;
     margin-top: 10px;
   }
 
   .opponent2 {
-    grid-area: 3 / 3 / 5 / 9;
+    grid-area: 3 / 3 / 4 / 9;
   }
 
   .opponent3 {
-    grid-area: 5 / 3 / 7 / 9;
+    grid-area: 4 / 3 / 5 / 9;
   }
 
   .discard {
-    grid-area: 7 / 1 / 11 / 11;
+    grid-area: 5 / 1 / 9 / 11;
   }
 
   .controls {
