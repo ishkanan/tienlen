@@ -269,6 +269,7 @@ func (g *Game) processTurnPassRequest(connID string) {
 		nextPlayer = g.players.AtPosition(g.nextPositionIfNotStolen)
 		nextPlayer.IsTurn = true
 		g.lastPlayed = nil
+		g.players.SetLastPlayed(*nextPlayer)
 		g.newRound = true
 		g.nextPositionIfNotStolen = 0
 	} else if g.players.NextTurn(nextPlayer).Position == nextPlayer.Position && g.nextPositionIfNotStolen == 0 {
