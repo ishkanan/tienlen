@@ -27,7 +27,8 @@ export interface Player {
 
 export enum GameEventKind {
   Info = 1,
-  Error = 2
+  Error = 2,
+  Warning = 3,
 }
 
 export interface GameEvent {

@@ -80,19 +80,19 @@ class Game extends VuexModule {
       message: 'You were disconnected from the game.',
     });
     this.connState = ConnectionState.NotConnected;
+    this.firstRound = true;
+    this.gameState = GameState.InLobby;
+    this.lastPlayed = [];
+    this.newRound = true;
     this.opponents = [];
     this.self = undefined;
     this.selfHand = [];
-    this.gameState = GameState.InLobby;
-    this.lastPlayed = [];
-    this.firstRound = true;
-    this.newRound = true;
     this.winPlaces = [];
   }
 
   @Action
   playerDisconnected({ response }: { response: PlayerDisconnectedResponse }) {
-    this.events.push({
+    this.showNotification({
       kind: GameEventKind.Info,
       message: `${response.player.name} has left the game.`,
     });
@@ -100,7 +100,7 @@ class Game extends VuexModule {
 
   @Action
   gameStarted({ response }: { response: GameStartedResponse }) {
-    this.events.push({
+    this.showNotification({
       kind: GameEventKind.Info,
       message: `${response.player.name} has started the game.`,
     });
@@ -108,7 +108,7 @@ class Game extends VuexModule {
 
   @Action
   gamePaused({ _ }: { _: GamePausedResponse }) {
-    this.events.push({
+    this.showNotification({
       kind: GameEventKind.Info,
       message: 'Game paused, will resume when all players re-connect.',
     });
@@ -116,7 +116,7 @@ class Game extends VuexModule {
 
   @Action
   gameResumed({ _ }: { _: GameResumedResponse }) {
-    this.events.push({
+    this.showNotification({
       kind: GameEventKind.Info,
       message: 'All players have re-connected, game resumed.',
     });
@@ -124,7 +124,7 @@ class Game extends VuexModule {
 
   @Action
   turnPassed({ response }: { response: TurnPassedResponse }) {
-    this.events.push({
+    this.showNotification({
       kind: GameEventKind.Info,
       message: `${response.player.name} has passed their turn.`,
     });
@@ -132,7 +132,7 @@ class Game extends VuexModule {
 
   @Action
   playerPlaced({ response }: { response: PlayerPlacedResponse }) {
-    this.events.push({
+    this.showNotification({
       kind: GameEventKind.Info,
       message: `${response.player.name} has no more cards and got ${ordinalise(response.place)} place.`,
     });
@@ -140,7 +140,7 @@ class Game extends VuexModule {
 
   @Action
   roundWon({ response }: { response: RoundWonResponse }) {
-    this.events.push({
+    this.showNotification({
       kind: GameEventKind.Info,
       message: `${response.player.name} has won the round.`,
     });
@@ -148,7 +148,7 @@ class Game extends VuexModule {
 
   @Action
   turnPlayed({ response }: { response: TurnPlayedResponse }) {
-    this.events.push({
+    this.showNotification({
       kind: GameEventKind.Info,
       message: `${response.player.name} has played their turn.`,
     });
@@ -156,7 +156,7 @@ class Game extends VuexModule {
 
   @Action
   gameWon({ response }: { response: GameWonResponse }) {
-    this.events.push({
+    this.showNotification({
       kind: GameEventKind.Info,
       message: `${response.player.name} has won the game.`,
     });
@@ -165,22 +165,27 @@ class Game extends VuexModule {
   @Action
   gameStateRefresh({ response }: { response: GameStateRefreshResponse }) {
     this.name = this.self ? this.self.name : this.name;
+    this.firstRound = response.firstRound;
+    this.gameState = response.gameState;
+    this.lastPlayed = response.lastPlayed;
+    this.newRound = response.newRound;
     this.opponents = response.opponents;
     this.self = response.self;
     this.selfHand = response.selfHand;
-    this.gameState = response.gameState;
-    this.lastPlayed = response.lastPlayed;
-    this.firstRound = response.firstRound;
-    this.newRound = response.newRound;
     this.winPlaces = response.winPlaces;
   }
 
   @Action
   actionError({ response }: { response: ErrorResponse }) {
-    this.events.push({
+    this.showNotification({
       kind: GameEventKind.Error,
       message: this.errorMap[response.kind],
     });
+  }
+
+  @Action
+  showNotification({ kind, message }: { kind: GameEventKind, message: string }) {
+    this.events.push({ kind, message });
   }
 }
 
