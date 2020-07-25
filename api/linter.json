@@ -1,0 +1,20 @@
+{
+  "Enable": [
+    "vet",
+    "vetshadow",
+    "golint",
+    "ineffassign",
+    "gotype",
+    "varcheck",
+    "structcheck",
+    "interfacer",
+    "unconvert",
+    "goconst"
+  ],
+  "vendor": true,
+  "tests": true,
+  "json": true,
+  "exclude": [
+
+  ]
+}

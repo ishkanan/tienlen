@@ -167,7 +167,7 @@ class Game extends VuexModule {
     this.name = this.self ? this.self.name : this.name;
     this.firstRound = response.firstRound;
     this.gameState = response.gameState;
-    this.lastPlayed = response.lastPlayed;
+    this.lastPlayed = response.lastPlayed ?? [];
     this.newRound = response.newRound;
     this.opponents = response.opponents;
     this.self = response.self;
