@@ -8,13 +8,31 @@ import { ToastObject, ToastPosition } from 'vue-toasted';
 import { GameEvent, GameEventKind } from '~/lib/models';
 import { game } from '~/store/game';
 
+const toastTypeMap: Record<GameEventKind, string> = {
+  [GameEventKind.Info]: 'info',
+  [GameEventKind.Error]: 'error',
+  [GameEventKind.Warning]: 'success',
+};
+
+interface Data {
+  windowWidth: number;
+}
+
 export default Vue.extend({
-  data() {
+  data(): Data {
     return {
       windowWidth: window.innerWidth,
-      toastOptions: {
+    };
+  },
+
+  computed: {
+    events(): GameEvent[] {
+      return game.events;
+    },
+    toastOptions() {
+      return {
         position: 'bottom-right' as ToastPosition,
-        duration: window.innerWidth <= 1100 ? 3000 : 5000,
+        duration: this.$data.windowWidth <= 1100 ? 3000 : 5000,
         keepOnHover: true,
         action: {
           text: 'Close',
@@ -22,13 +40,7 @@ export default Vue.extend({
             toastObject.goAway(0);
           },
         },
-      },
-    };
-  },
-
-  computed: {
-    events(): GameEvent[] {
-      return game.events;
+      };
     },
   },
 
@@ -42,7 +54,7 @@ export default Vue.extend({
             event.message,
             {
               ...this.toastOptions,
-              type: event.kind === GameEventKind.Error ? 'error' : 'info',
+              type: toastTypeMap[event.kind] ?? 'info',
             },
           );
         });
@@ -77,7 +89,8 @@ export default Vue.extend({
     font-size: 13px !important;
     padding: 2px 10px;
     margin: 1px !important;
-    max-height: 30px;
+    min-height: 24px;
+    max-height: 24px;
   }
 }
 </style>

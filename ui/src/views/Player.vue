@@ -7,6 +7,7 @@
       <button v-if="canStart" @click="doStart">Start game</button>
       <button v-if="canPlay" @click="doPlay">Play cards</button>
       <button v-if="canPass" class="danger" @click="doPass">Pass turn</button>
+      <h2 v-if="autoPassing">Your turn will be automatically passed...</h2>
       <h2 v-if="waiting">Waiting for turn...</h2>
       <h2 v-if="winPlace > 0 && !canStart">All done bucko! Have a break.</h2>
     </div>
@@ -43,12 +44,14 @@ import Vue from 'vue';
 import BlockIcon from '~/components/BlockIcon.vue';
 import CardView from '~/components/Card.vue';
 import Hand from '~/components/Hand.vue';
-import { Card, Player, Suit } from '~/lib/models';
+import { Card, Player, Suit, GameEventKind } from '~/lib/models';
 import { ordinalise, startFlashTitle } from '~/lib/utils';
 import { requestStartGame, requestTurnPass, requestTurnPlay } from '~/lib/socket';
 import { game } from '~/store/game';
 
 interface Data {
+  autoPassed: boolean;
+  autoPassing: boolean;
   selectedRanks: number[];
 }
 
@@ -61,6 +64,8 @@ export default Vue.extend({
 
   data(): Data {
     return {
+      autoPassed: false,
+      autoPassing: false,
       selectedRanks: [],
     };
   },
@@ -68,8 +73,7 @@ export default Vue.extend({
   computed: {
     waiting(): boolean {
       return game.isInProgress &&
-        !!this.player &&
-        !this.player.isTurn &&
+        (!this.player?.isTurn ?? false) &&
         this.winPlace === 0;
     },
     winPlace(): number {
@@ -88,14 +92,16 @@ export default Vue.extend({
         !game.isPaused &&
         !game.firstRound &&
         !game.newRound &&
-        !!this.player &&
-        this.player.isTurn;
+        (this.player?.isTurn ?? false) &&
+        !this.autoPassing &&
+        !this.autoPassed;
     },
     canPlay(): boolean {
       return game.isInProgress &&
         !game.isPaused &&
-        !!this.player &&
-        this.player.isTurn;
+        (this.player?.isTurn ?? false) &&
+        !this.autoPassing &&
+        !this.autoPassed;
     },
     showHand(): boolean {
       return game.isInProgress &&
@@ -119,7 +125,10 @@ export default Vue.extend({
       return game.isPaused;
     },
     passed(): boolean {
-      return !!this.player && this.player.isPassed;
+      return this.player?.isPassed ?? false;
+    },
+    newRound(): boolean {
+      return game.newRound;
     },
   },
 
@@ -127,8 +136,30 @@ export default Vue.extend({
     canPlay: {
       immediate: true,
       handler(value: boolean) {
+        // we auto-skip if we have less cards than other players' last played
+        // (since it is impossible to beat with less cards)
+        if (this.canPlay && game.lastPlayed.length > this.hand.length && (!this.player?.lastPlayed ?? false)) {
+          this.autoPassing = true;
+          window.setTimeout(() => {
+            this.doPass();
+            game.showNotification({
+              kind: GameEventKind.Warning,
+              message: 'Your turn was auto-passed.',
+            });
+            this.autoPassing = false;
+            this.autoPassed = true;
+          }, 2000);
+          return;
+        }
+
         const name = this.player?.name || '';
         value && startFlashTitle(`Tiến lên || ${name}`, '★ ★ IT IS YOUR TURN ★ ★');
+      },
+    },
+    newRound: {
+      immediate: true,
+      handler(value: boolean) {
+        if (value) this.autoPassed = false;
       },
     },
     paused: {
