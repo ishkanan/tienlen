@@ -11,6 +11,7 @@
 <script lang="ts">
 import Vue, { PropType } from 'vue';
 import { Card, Suit } from '~/lib/models';
+import WindowSizable from '~/mixins/WindowSizable.vue';
 
 const suitYmap: Record<Suit, number> = {
   [Suit.Spades]: 360,
@@ -21,10 +22,11 @@ const suitYmap: Record<Suit, number> = {
 
 interface Data {
   selected: boolean;
-  windowWidth: number;
 }
 
 export default Vue.extend({
+  mixins: [WindowSizable],
+
   props: {
     card: {
       type: Object as PropType<Card>,
@@ -43,13 +45,12 @@ export default Vue.extend({
   data(): Data {
     return {
       selected: false,
-      windowWidth: window.innerWidth,
     };
   },
 
   computed: {
     scaleFactor(): number {
-      return this.windowWidth <= 1100 ? 0.75 : 1;
+      return this.$data.windowWidth <= 1100 ? 0.75 : 1;
     },
     offsetX(): number {
       if (!this.showFace) return 0;
@@ -67,22 +68,11 @@ export default Vue.extend({
     },
   },
 
-  beforeDestroy() {
-    window.removeEventListener('resize', this.handleWindowResize);
-  },
-
-  mounted() {
-    window.addEventListener('resize', this.handleWindowResize);
-  },
-
   methods: {
     onClick() {
       if (!this.selectable) return;
       this.selected = !this.selected;
       this.$emit('selected', this.selected);
-    },
-    handleWindowResize() {
-      this.windowWidth = window.innerWidth;
     },
   },
 });

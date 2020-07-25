@@ -6,6 +6,7 @@
 import Vue from 'vue';
 import { ToastObject, ToastPosition } from 'vue-toasted';
 import { GameEvent, GameEventKind } from '~/lib/models';
+import WindowSizable from '~/mixins/WindowSizable.vue';
 import { game } from '~/store/game';
 
 const toastTypeMap: Record<GameEventKind, string> = {
@@ -14,16 +15,8 @@ const toastTypeMap: Record<GameEventKind, string> = {
   [GameEventKind.Warning]: 'success',
 };
 
-interface Data {
-  windowWidth: number;
-}
-
 export default Vue.extend({
-  data(): Data {
-    return {
-      windowWidth: window.innerWidth,
-    };
-  },
+  mixins: [WindowSizable],
 
   computed: {
     events(): GameEvent[] {
@@ -62,20 +55,6 @@ export default Vue.extend({
       },
     },
   },
-
-  mounted() {
-    window.addEventListener('resize', this.handleWindowResize);
-  },
-
-  beforeDestroy() {
-    window.removeEventListener('resize', this.handleWindowResize);
-  },
-
-  methods: {
-    handleWindowResize() {
-      this.windowWidth = window.innerWidth;
-    },
-  },
 });
 </script>
 
@@ -87,10 +66,10 @@ export default Vue.extend({
 @media (max-width: 1100px) {
   :global(.toasted) {
     font-size: 13px !important;
-    padding: 2px 10px;
+    padding: 2px 7px;
     margin: 1px !important;
-    min-height: 24px;
-    max-height: 24px;
+    min-height: 22px !important;
+    max-height: 22px;
   }
 }
 </style>
