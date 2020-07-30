@@ -69,6 +69,10 @@ func buildRequest(ident string, data []byte) (interface{}, error) {
 		request := joinGameRequest{}
 		err := json.Unmarshal(data, &request)
 		return request, err
+	case "LEAVE_GAME":
+		request := leaveGameRequest{}
+		err := json.Unmarshal(data, &request)
+		return request, err
 	case "START_GAME":
 		request := startGameRequest{}
 		err := json.Unmarshal(data, &request)
@@ -90,6 +94,7 @@ func buildRequest(ident string, data []byte) (interface{}, error) {
 func responseMap() map[reflect.Type]string {
 	return map[reflect.Type]string{
 		reflect.TypeOf(playerJoinedResponse{}):       "PLAYER_JOINED",
+		reflect.TypeOf(playerLeftResponse{}):         "PLAYER_LEFT",
 		reflect.TypeOf(playerDisconnectedResponse{}): "PLAYER_DISCONNECTED",
 		reflect.TypeOf(gameStartedResponse{}):        "GAME_STARTED",
 		reflect.TypeOf(gamePausedResponse{}):         "GAME_PAUSED",

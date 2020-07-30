@@ -17,6 +17,14 @@ type playerJoinedResponse struct {
 	Player player `json:"player"`
 }
 
+// player announcing they are leaving the game
+type leaveGameRequest struct{}
+
+// informs all players of a player left event
+type playerLeftResponse struct {
+	Player player `json:"player"`
+}
+
 // informs all players of a disconnection event
 type playerDisconnectedResponse struct {
 	Player player `json:"player"`

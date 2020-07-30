@@ -6,6 +6,7 @@ import {
   StartGameRequest,
   TurnPassRequest,
   TurnPlayRequest,
+  LeaveGameRequest,
 } from './messages';
 
 const wsUrl = window.location.protocol.replace('http', 'ws') + '//' + window.location.host + window.location.pathname + (window.location.pathname.endsWith('/') ? 'api' : '/api');
@@ -28,6 +29,14 @@ export function joinGame({ name }: { name: string }): void {
       request,
     });
   };
+}
+
+export function requestLeaveGame(): void {
+  const request: LeaveGameRequest = {};
+  sendMessage({
+    kind: 'LEAVE_GAME',
+    request,
+  });
 }
 
 export function requestStartGame(): void {
@@ -67,6 +76,7 @@ function sendMessage({ kind, request }: { kind: string, request: JoinGameRequest
 const actions: Record<string, any> = {
   'PLAYER_JOINED': game.playerJoined,
   'PLAYER_DISCONNECTED': game.playerDisconnected,
+  'PLAYER_LEFT': game.playerLeft,
   'GAME_STARTED': game.gameStarted,
   'GAME_PAUSED': game.gamePaused,
   'GAME_RESUMED': game.gameResumed,

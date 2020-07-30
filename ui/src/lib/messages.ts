@@ -13,6 +13,12 @@ export interface PlayerJoinedResponse {
   player: Player;
 }
 
+export interface LeaveGameRequest {}
+
+export interface PlayerLeftResponse {
+  player: Player;
+}
+
 export interface PlayerDisconnectedResponse {
   player: Player;
 }

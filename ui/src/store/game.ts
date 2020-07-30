@@ -8,6 +8,7 @@ import {
   GameState,
   GameStateRefreshResponse,
   GameWonResponse,
+  PlayerLeftResponse,
   PlayerDisconnectedResponse,
   PlayerJoinedResponse,
   PlayerPlacedResponse,
@@ -92,6 +93,14 @@ class Game extends VuexModule {
 
   @Action
   playerDisconnected({ response }: { response: PlayerDisconnectedResponse }) {
+    this.showNotification({
+      kind: GameEventKind.Info,
+      message: `${response.player.name} has unexpectedly disconnected.`,
+    });
+  }
+
+  @Action
+  playerLeft({ response }: { response: PlayerLeftResponse }) {
     this.showNotification({
       kind: GameEventKind.Info,
       message: `${response.player.name} has left the game.`,

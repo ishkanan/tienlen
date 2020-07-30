@@ -1,9 +1,9 @@
 <template>
   <div :class="$style.viewport">
-    <button @click="onScoresOpen">Scores</button>
-    <ds-score-board
+    <button @click="onScoresOpen">Scoreboard</button>
+    <button class="danger" @click="onLeaveGame">Leave game</button>
+    <ds-scores
       v-if="scoresVisible"
-      :scores="scores"
       @close="onScoresClose"
     />
   </div>
@@ -11,9 +11,10 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import ScoreBoard, { ScoreLine } from '~/components/ScoreBoard.vue';
 import { GameState } from '~/lib/messages';
+import { requestLeaveGame } from '~/lib/socket';
 import { game } from '~/store/game';
+import Scores from '~/views/Scores.vue';
 
 interface Data {
   scoresVisible: boolean;
@@ -21,7 +22,7 @@ interface Data {
 
 export default Vue.extend({
   components: {
-    'ds-score-board': ScoreBoard,
+    'ds-scores': Scores,
   },
 
   data(): Data {
@@ -31,25 +32,6 @@ export default Vue.extend({
   },
 
   computed: {
-    deltas(): Record<number, number> {
-      if (game.isInProgress) return {};
-      return game.winPlaces.reduce<Record<number, number>>((memo, player, i) => {
-        memo[player.position] = game.opponents.length - i;
-        return memo;
-      }, {});
-    },
-    scores(): ScoreLine[] {
-      const selfScore = {
-        playerName: game.self?.name || 'YOU',
-        score: game.self?.score || 0,
-        delta: (game.self && this.deltas[game.self.position]) || 0,
-      };
-      return game.opponents.map(o => ({
-        playerName: o.name,
-        score: o.score,
-        delta: this.deltas[o.position] || 0,
-      })).concat(selfScore);
-    },
     gameState(): GameState {
       return game.gameState;
     },
@@ -67,6 +49,11 @@ export default Vue.extend({
   },
 
   methods: {
+    onLeaveGame() {
+      if (window.confirm('Are you sure you want to leave the game?')) {
+        requestLeaveGame();
+      }
+    },
     onScoresOpen() {
       this.scoresVisible = true;
     },
@@ -81,5 +68,9 @@ export default Vue.extend({
 .viewport {
   width: 100%;
   height: 100%;
+
+  & button:not(:first-child) {
+    margin-top: 20px;
+  }
 }
 </style>

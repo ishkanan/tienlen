@@ -80,6 +80,10 @@ func (g *Game) ConnectionStateChanged(connUUID uuid.UUID, conn IMessageSink, sta
 
 	// disconnection
 
+	if _, ok := g.connections[connID]; !ok {
+		return
+	}
+
 	player := g.connections[connID].Player
 	if player != nil {
 		player.Connected = false
@@ -128,6 +132,11 @@ func (g *Game) ProcessRequest(connUUID uuid.UUID, request interface{}, requestTy
 	if g.connections[connID].Player == nil {
 		utils.LogDebug("ProcessRequest: request ignored for %s - %+v", connID, request)
 		g.sendOnConnection(connID, errorResponse{Kind: errKindNotAuthorised})
+		return
+	}
+
+	if requestType == reflect.TypeOf(leaveGameRequest{}) {
+		g.processLeaveRequest(connID)
 		return
 	}
 
@@ -207,6 +216,34 @@ func (g *Game) processJoinGameRequest(connID string, req joinGameRequest) {
 		g.state = gameStateRunning
 		g.sendToAllPlayers(gameResumedResponse{})
 		utils.LogInfo("processJoinGameRequest: All players have re-joined, game is resumed")
+	}
+
+	g.sendStateToAllPlayers()
+}
+
+func (g *Game) processLeaveRequest(connID string) {
+	player := g.connections[connID].Player
+	g.connections[connID].Connection.Close()
+	delete(g.connections, connID)
+	g.players = g.players.DeleteByName(player.Name)
+
+	g.sendToAllPlayers(playerLeftResponse{Player: *player})
+	utils.LogInfo("processLeaveRequest: %s has left the game", player.Name)
+
+	if len(g.players) == g.disconnectedCount()+g.unmappedCount() {
+		g.Init()
+		utils.LogInfo("processLeaveRequest: All players have left, game is reset")
+		return
+	}
+
+	g.players.ResetScores()
+	g.state = gameStateInLobby
+
+	// we re-number positions to be sequential
+	for _, p := range g.players {
+		if p.Position > player.Position {
+			p.Position--
+		}
 	}
 
 	g.sendStateToAllPlayers()
