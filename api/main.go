@@ -12,7 +12,6 @@ import (
 
 var addr = flag.String("addr", "localhost:27000", "HTTP service address")
 var uiFolder = flag.String("ui", "dist", "Folder container UI files")
-var theGame game.Game
 
 func main() {
 	fmt.Println("Tiến lên (aka. Thirteen) server\n" +
