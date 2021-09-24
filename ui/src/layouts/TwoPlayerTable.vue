@@ -1,21 +1,21 @@
 <template>
   <div :class="$style.viewport">
     <div :class="$style.player">
-      <slot name="player"/>
+      <slot name="player" />
+    </div>
+    <div :class="$style.opponent1">
+      <slot name="opponent1" />
     </div>
     <div :class="$style.discard">
-      <slot name="discard"/>
-    </div>
-    <div :class="$style.controls">
-      <slot name="controls"/>
+      <slot name="discard" />
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
+import { defineComponent } from '@vue/composition-api';
 
-export default Vue.extend({});
+export default defineComponent({});
 </script>
 
 <style lang="postcss" module>
@@ -29,6 +29,10 @@ export default Vue.extend({});
 
 .player {
   grid-area: 5 / 2 / 7 / 10;
+}
+
+.opponent1 {
+  grid-area: 1 / 5 / 3 / 7;
 }
 
 .discard {
@@ -46,11 +50,16 @@ export default Vue.extend({});
   }
 
   .player {
-    grid-area: 7 / 1 / 11 / 11;
+    grid-area: 8 / 1 / 12 / 11;
+  }
+
+  .opponent1 {
+    grid-area: 2 / 3 / 3 / 9;
+    margin-top: 10px;
   }
 
   .discard {
-    grid-area: 2 / 1 / 6 / 11;
+    grid-area: 3 / 1 / 7 / 11;
   }
 
   .controls {

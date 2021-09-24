@@ -1,3 +1,4 @@
+import { orderBy } from 'lodash-es';
 import { VuexModule, Module, Action } from 'vuex-class-modules';
 import {
   ErrorKind,
@@ -15,21 +16,21 @@ import {
   TurnPassedResponse,
   TurnPlayedResponse,
 } from '~/lib/messages';
-import { Card, GameEvent, GameEventKind, Player } from '~/lib/models';
+import { Card, Event, EventRune, EventSeverity, Player } from '~/lib/models';
 import { ordinalise } from '~/lib/utils';
 import store from '~/store';
 
 export enum ConnectionState {
   NotConnected = 0,
   Connecting = 1,
-  Connected = 2
+  Connected = 2,
 }
 
 @Module({ generateMutationSetters: true })
 class Game extends VuexModule {
   connState: ConnectionState = ConnectionState.NotConnected;
   name = '';
-  events: GameEvent[] = [];
+  events: Event[] = [];
   opponents: Player[] = [];
   self: Player | undefined = undefined;
   selfHand: Card[] = [];
@@ -40,16 +41,46 @@ class Game extends VuexModule {
   winPlaces: Player[] = [];
 
   private errorMap = {
-    [ErrorKind.LobbyNotReady]: 'Game is not ready to start yet.',
-    [ErrorKind.NotAuthorised]: 'You cannot perform that action now.',
-    [ErrorKind.OutOfTurn]: 'It is not your turn.',
-    [ErrorKind.MustPlay]: 'You must play one or more cards.',
-    [ErrorKind.InvalidCards]: 'Game did not recognise your cards.',
-    [ErrorKind.InvalidPattern]: 'Those cards cannot be played.',
-    [ErrorKind.CardsNotBetter]: 'Cards do not beat last played.',
-    [ErrorKind.MustPlayLowest]: 'Must play lowest card.',
-    [ErrorKind.NameTaken]: 'That name is already taken.',
-    [ErrorKind.GameFull]: 'The game is full.',
+    [ErrorKind.LobbyNotReady]: {
+      message: 'Game is not yet ready to start.',
+      toast: false,
+    },
+    [ErrorKind.NotAuthorised]: {
+      message: 'You cannot perform that action now.',
+      toast: false,
+    },
+    [ErrorKind.OutOfTurn]: {
+      message: 'It is not your turn.',
+      toast: false,
+    },
+    [ErrorKind.MustPlay]: {
+      message: 'You must play one or more cards.',
+      toast: false,
+    },
+    [ErrorKind.InvalidCards]: {
+      message: 'Unrecognised cards, did you select any?',
+      toast: false,
+    },
+    [ErrorKind.InvalidPattern]: {
+      message: 'Cards cannot be played.',
+      toast: false,
+    },
+    [ErrorKind.CardsNotBetter]: {
+      message: 'Cards do not beat the last played hand.',
+      toast: false,
+    },
+    [ErrorKind.MustPlayLowest]: {
+      message: 'You must play your lowest card.',
+      toast: false,
+    },
+    [ErrorKind.NameTaken]: {
+      message: 'That name is already taken.',
+      toast: true,
+    },
+    [ErrorKind.GameFull]: {
+      message: 'The game is full.',
+      toast: true,
+    },
   };
 
   get isInLobby(): boolean {
@@ -66,18 +97,19 @@ class Game extends VuexModule {
 
   @Action
   playerJoined({ response }: { response: PlayerJoinedResponse }) {
-    this.events.push({
-      kind: GameEventKind.Info,
-      message: `${response.player.name} has joined the game.`,
+    this.pushEvent({
+      severity: EventSeverity.Info,
+      runes: [{ message: `${response.player.name} has joined the game.` }],
     });
     this.connState = ConnectionState.Connected;
   }
 
   @Action
   selfDisconnected() {
-    this.events.push({
-      kind: GameEventKind.Error,
-      message: 'You were disconnected from the game.',
+    this.pushEvent({
+      severity: EventSeverity.Error,
+      runes: [{ message: 'You were disconnected from the game.' }],
+      toast: true,
     });
     this.connState = ConnectionState.NotConnected;
     this.firstRound = true;
@@ -92,73 +124,85 @@ class Game extends VuexModule {
 
   @Action
   playerDisconnected({ response }: { response: PlayerDisconnectedResponse }) {
-    this.showNotification({
-      kind: GameEventKind.Info,
-      message: `${response.player.name} has left the game.`,
+    this.pushEvent({
+      severity: this.isInLobby ? EventSeverity.Info : EventSeverity.Error,
+      runes: [{ message: `${response.player.name} has left the game.` }],
     });
   }
 
   @Action
   gameStarted({ response }: { response: GameStartedResponse }) {
-    this.showNotification({
-      kind: GameEventKind.Info,
-      message: `${response.player.name} has started the game.`,
+    this.pushEvent({
+      severity: EventSeverity.Info,
+      runes: [{ message: `${response.player.name} has started the game.` }],
     });
   }
 
   @Action
   gamePaused({ _ }: { _: GamePausedResponse }) {
-    this.showNotification({
-      kind: GameEventKind.Info,
-      message: 'Game paused, will resume when all players re-connect.',
+    this.pushEvent({
+      severity: EventSeverity.Warning,
+      runes: [{ message: 'Game is paused and will resume when all players re-connect.' }],
     });
   }
 
   @Action
   gameResumed({ _ }: { _: GameResumedResponse }) {
-    this.showNotification({
-      kind: GameEventKind.Info,
-      message: 'All players have re-connected, game resumed.',
+    this.pushEvent({
+      severity: EventSeverity.Info,
+      runes: [{ message: 'All players have re-connected, game has resumed.' }],
     });
   }
 
   @Action
   turnPassed({ response }: { response: TurnPassedResponse }) {
-    this.showNotification({
-      kind: GameEventKind.Info,
-      message: `${response.player.name} has passed their turn.`,
+    this.pushEvent({
+      severity: EventSeverity.Info,
+      runes: [{ message: `${response.player.name} has passed their turn.` }],
     });
   }
 
   @Action
   playerPlaced({ response }: { response: PlayerPlacedResponse }) {
-    this.showNotification({
-      kind: GameEventKind.Info,
-      message: `${response.player.name} has no more cards and got ${ordinalise(response.place)} place.`,
+    this.pushEvent({
+      severity: EventSeverity.Info,
+      runes: [
+        {
+          message: `${response.player.name} has no more cards and placed ${ordinalise(
+            response.place,
+          )}.`,
+        },
+      ],
     });
   }
 
   @Action
   roundWon({ response }: { response: RoundWonResponse }) {
-    this.showNotification({
-      kind: GameEventKind.Info,
-      message: `${response.player.name} has won the round.`,
+    this.pushEvent({
+      severity: EventSeverity.Info,
+      runes: [{ message: `${response.player.name} has won the round.` }],
     });
   }
 
   @Action
   turnPlayed({ response }: { response: TurnPlayedResponse }) {
-    this.showNotification({
-      kind: GameEventKind.Info,
-      message: `${response.player.name} has played their turn.`,
+    const cards = orderBy(response.cards, ['globalRank'], ['desc']).map((c) => ({ card: c }));
+    this.pushEvent({
+      severity: EventSeverity.Info,
+      runes: [
+        {
+          message: `${response.player.name} played `,
+        },
+        ...cards,
+      ],
     });
   }
 
   @Action
   gameWon({ response }: { response: GameWonResponse }) {
-    this.showNotification({
-      kind: GameEventKind.Info,
-      message: `${response.player.name} has won the game.`,
+    this.pushEvent({
+      severity: EventSeverity.Info,
+      runes: [{ message: `${response.player.name} has won the game.` }],
     });
   }
 
@@ -177,15 +221,29 @@ class Game extends VuexModule {
 
   @Action
   actionError({ response }: { response: ErrorResponse }) {
-    this.showNotification({
-      kind: GameEventKind.Error,
-      message: this.errorMap[response.kind],
+    this.pushEvent({
+      severity: EventSeverity.Error,
+      runes: [{ message: this.errorMap[response.kind].message }],
+      toast: this.errorMap[response.kind].toast,
     });
   }
 
   @Action
-  showNotification({ kind, message }: { kind: GameEventKind, message: string }) {
-    this.events.push({ kind, message });
+  pushEvent({
+    severity,
+    runes,
+    toast,
+  }: {
+    severity: EventSeverity;
+    runes: EventRune[];
+    toast?: boolean;
+  }) {
+    this.events.push({
+      severity,
+      runes,
+      timestamp: new Date(),
+      toast: toast !== undefined ? toast : false,
+    });
   }
 }
 

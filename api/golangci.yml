@@ -25,12 +25,12 @@ linters:
     - dogsled
     - gochecknoinits
     - gofmt
-    - golint
     - goprintffuncname
     - gosimple
     - govet
     - ineffassign
     - misspell
+    - revive
     - nolintlint
     - rowserrcheck
     - staticcheck

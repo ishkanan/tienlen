@@ -1,27 +1,24 @@
 <template>
   <div :class="$style.viewport">
     <div :class="$style.player">
-      <slot name="player"/>
+      <slot name="player" />
     </div>
     <div :class="$style.opponent1">
-      <slot name="opponent1"/>
+      <slot name="opponent1" />
     </div>
     <div :class="$style.opponent2">
-      <slot name="opponent2"/>
+      <slot name="opponent2" />
     </div>
     <div :class="$style.discard">
-      <slot name="discard"/>
-    </div>
-    <div :class="$style.controls">
-      <slot name="controls"/>
+      <slot name="discard" />
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
+import { defineComponent } from '@vue/composition-api';
 
-export default Vue.extend({});
+export default defineComponent({});
 </script>
 
 <style lang="postcss" module>

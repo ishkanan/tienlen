@@ -1,4 +1,3 @@
-
 export enum Suit {
   Spades = 1,
   Clubs = 2,
@@ -25,13 +24,20 @@ export interface Player {
   score: number;
 }
 
-export enum GameEventKind {
+export enum EventSeverity {
   Info = 1,
   Error = 2,
   Warning = 3,
 }
 
-export interface GameEvent {
-  kind: GameEventKind;
-  message: string;
+export interface EventRune {
+  card?: Card;
+  message?: string;
+}
+
+export interface Event {
+  severity: EventSeverity;
+  timestamp: Date;
+  runes: EventRune[];
+  toast: boolean;
 }
