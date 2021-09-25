@@ -410,14 +410,14 @@ func (g Game) unmappedCount() int {
 func (g Game) sendToAllPlayers(response interface{}) {
 	for _, context := range g.connections {
 		if context.Player != nil {
-			context.Connection.Send(response)
+			_ = context.Connection.Send(response)
 		}
 	}
 }
 
 // sends a response-type message to a connection (mapped or un-mapped)
 func (g Game) sendOnConnection(connID string, response interface{}) {
-	g.connections[connID].Connection.Send(response)
+	_ = g.connections[connID].Connection.Send(response)
 }
 
 // sends a customised gameStateRefreshResponse to each player
@@ -435,7 +435,7 @@ func (g Game) sendStateToAllPlayers() {
 			}
 		}
 
-		context.Connection.Send(gameStateRefreshResponse{
+		_ = context.Connection.Send(gameStateRefreshResponse{
 			Opponents:  opponents,
 			Self:       *context.Player,
 			SelfHand:   context.Player.Hand,

@@ -1,4 +1,3 @@
-
 let flashHandle: number | undefined = undefined;
 
 export function startFlashTitle(regular: string, alternate: string): void {
@@ -15,7 +14,7 @@ export function startFlashTitle(regular: string, alternate: string): void {
     }
 
     window.document.title = n === 0 ? regular : alternate;
-    n = ((n + 1) % 2);
+    n = (n + 1) % 2;
     flashHandle = window.setTimeout(flasher, 1000);
   };
   flasher();
@@ -30,6 +29,7 @@ export function setTitle(title: string): void {
 }
 
 export function ordinalise(n: number): string {
-  const s = ['th', 'st', 'nd', 'rd'], v = n % 100;
+  const s = ['th', 'st', 'nd', 'rd'],
+    v = n % 100;
   return `${n}${s[(v - 20) % 10] || s[v] || s[0]}`;
 }

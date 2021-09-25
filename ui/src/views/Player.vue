@@ -1,8 +1,5 @@
 <template>
-  <div
-    v-if="player"
-    :class="$style.viewport"
-  >
+  <div v-if="player" :class="$style.viewport">
     <div :class="$style.controls">
       <button v-if="canStart" @click="doStart">Start game</button>
       <button v-if="canPlay" @click="doPlay">Play cards</button>
@@ -17,13 +14,9 @@
         <h2 :class="$style.note">{{ ordinalisedWinPlace }}</h2>
       </div>
 
-      <ds-hand
-        v-else-if="showHand"
-        :cards="hand"
-        @selected="onSelected"
-      />
+      <Hand v-else-if="showHand" :cards="hand" @selected="onSelected" />
 
-      <ds-card
+      <CardView
         v-else
         :class="$style.unfaced"
         :card="unfaced"
@@ -33,163 +26,152 @@
     </div>
 
     <div :class="$style.nameBar">
-      <ds-block-icon v-if="passed" :class="$style.block"/>
+      <BlockIcon v-if="passed" :class="$style.block" />
       <h3 :class="{ [$style.isTurn]: player.isTurn }">{{ player.name }}</h3>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
+import { defineComponent, computed, ref, watch } from '@vue/composition-api';
 import BlockIcon from '~/components/BlockIcon.vue';
 import CardView from '~/components/Card.vue';
 import Hand from '~/components/Hand.vue';
-import { Card, Player, Suit, GameEventKind } from '~/lib/models';
+import { Card, Suit, EventSeverity } from '~/lib/models';
 import { ordinalise, startFlashTitle } from '~/lib/utils';
 import { requestStartGame, requestTurnPass, requestTurnPlay } from '~/lib/socket';
 import { game } from '~/store/game';
 
-interface Data {
-  autoPassed: boolean;
-  autoPassing: boolean;
-  selectedRanks: number[];
-}
+export default defineComponent({
+  components: { BlockIcon, CardView, Hand },
 
-export default Vue.extend({
-  components: {
-    'ds-block-icon': BlockIcon,
-    'ds-card': CardView,
-    'ds-hand': Hand,
-  },
+  setup() {
+    const autoPassed = ref(false);
+    const autoPassing = ref(false);
+    const selectedRanks = ref<number[]>([]);
 
-  data(): Data {
-    return {
-      autoPassed: false,
-      autoPassing: false,
-      selectedRanks: [],
-    };
-  },
-
-  computed: {
-    waiting(): boolean {
-      return game.isInProgress &&
-        (!this.player?.isTurn ?? false) &&
-        this.winPlace === 0;
-    },
-    winPlace(): number {
-      const placed = game.winPlaces.findIndex(p => p.position === game.self?.position);
+    const player = computed(() => game.self);
+    const winPlace = computed(() => {
+      const placed = game.winPlaces.findIndex((p) => p.position === game.self?.position);
       return placed === -1 ? 0 : placed + 1;
-    },
-    ordinalisedWinPlace(): string {
-      return ordinalise(this.winPlace);
-    },
-    canStart(): boolean {
-      return !game.isInProgress &&
-        game.opponents.length > 0;
-    },
-    canPass(): boolean {
-      return game.isInProgress &&
+    });
+    const ordinalisedWinPlace = computed(() => ordinalise(winPlace.value));
+    const waiting = computed(
+      () => game.isInProgress && (!player.value?.isTurn ?? false) && winPlace.value === 0,
+    );
+    const canStart = computed(() => !game.isInProgress && game.opponents.length > 0);
+    const canPass = computed(
+      () =>
+        game.isInProgress &&
         !game.isPaused &&
         !game.firstRound &&
         !game.newRound &&
-        (this.player?.isTurn ?? false) &&
-        !this.autoPassing &&
-        !this.autoPassed;
-    },
-    canPlay(): boolean {
-      return game.isInProgress &&
+        (player.value?.isTurn ?? false) &&
+        !autoPassing.value &&
+        !autoPassed.value,
+    );
+    const canPlay = computed(
+      () =>
+        game.isInProgress &&
         !game.isPaused &&
-        (this.player?.isTurn ?? false) &&
-        !this.autoPassing &&
-        !this.autoPassed;
-    },
-    showHand(): boolean {
-      return game.isInProgress &&
-        this.winPlace === 0;
-    },
-    player(): Player | undefined {
-      return game.self;
-    },
-    hand(): Card[] {
-      return game.selfHand;
-    },
-    unfaced(): Card {
+        (player.value?.isTurn ?? false) &&
+        !autoPassing.value &&
+        !autoPassed.value,
+    );
+    const showHand = computed(() => game.isInProgress && winPlace.value === 0);
+    const hand = computed(() => game.selfHand);
+    const unfaced = computed(() => {
       return {
         suit: Suit.Spades,
         faceValue: 2,
         globalRank: 1,
         suitRank: 1,
       };
-    },
-    paused(): boolean {
-      return game.isPaused;
-    },
-    passed(): boolean {
-      return this.player?.isPassed ?? false;
-    },
-    newRound(): boolean {
-      return game.newRound;
-    },
-  },
+    });
+    const paused = computed(() => game.isPaused);
+    const passed = computed(() => player.value?.isPassed ?? false);
+    const newRound = computed(() => game.newRound);
 
-  watch: {
-    canPlay: {
-      immediate: true,
-      handler(value: boolean) {
-        // we auto-skip if we have less cards than other players' last played
-        // (since it is impossible to beat with less cards)
-        if (this.canPlay && game.lastPlayed.length > this.hand.length && (!this.player?.lastPlayed ?? false)) {
-          this.autoPassing = true;
-          window.setTimeout(() => {
-            this.doPass();
-            game.showNotification({
-              kind: GameEventKind.Warning,
-              message: 'Your turn was auto-passed.',
-            });
-            this.autoPassing = false;
-            this.autoPassed = true;
-          }, 2000);
-          return;
-        }
-
-        const name = this.player?.name || '';
-        value && startFlashTitle(`Tiến lên || ${name}`, '★ ★ IT IS YOUR TURN ★ ★');
-      },
-    },
-    newRound: {
-      immediate: true,
-      handler(value: boolean) {
-        if (value) this.autoPassed = false;
-      },
-    },
-    paused: {
-      immediate: true,
-      handler(value: boolean) {
-        const name = this.player?.name || '';
-        !value && this.player?.isTurn && startFlashTitle(`Tiến lên || ${name}`, '★ ★ IT IS YOUR TURN ★ ★');
-      },
-    },
-  },
-
-  methods: {
-    doStart() {
-      requestStartGame();
-    },
-    doPass() {
-      requestTurnPass();
-    },
-    doPlay() {
-      const cards = this.selectedRanks.reduce<Card[]>((memo, rank) => {
-        const card = game.selfHand.find(c => c.globalRank === rank);
+    const doStart = () => requestStartGame();
+    const doPass = () => requestTurnPass();
+    const doPlay = () => {
+      const cards = selectedRanks.value.reduce<Card[]>((memo, rank) => {
+        const card = game.selfHand.find((c) => c.globalRank === rank);
         if (!card) return memo;
         memo.push(card);
         return memo;
       }, []);
       requestTurnPlay({ cards });
-    },
-    onSelected(ranks: number[]) {
-      this.selectedRanks = ranks;
-    },
+    };
+    const onSelected = (ranks: number[]) => (selectedRanks.value = ranks);
+
+    watch(
+      canPlay,
+      (val) => {
+        // we auto-skip if we have less cards than other players' last played
+        // (since it is impossible to beat with less cards)
+        if (
+          canPlay.value &&
+          game.lastPlayed.length > hand.value.length &&
+          (!player.value?.lastPlayed ?? false)
+        ) {
+          autoPassing.value = true;
+          window.setTimeout(() => {
+            doPass();
+            game.pushEvent({
+              severity: EventSeverity.Warning,
+              runes: [
+                { message: 'You were auto-passed as you have less cards than the current hand.' },
+              ],
+            });
+            autoPassing.value = false;
+            autoPassed.value = true;
+          }, 2000);
+          return;
+        }
+
+        const name = player.value?.name || '';
+        val && startFlashTitle(`Tiến lên || ${name}`, '★ ★ IT IS YOUR TURN ★ ★');
+      },
+      { immediate: true },
+    );
+
+    watch(
+      newRound,
+      (val) => {
+        if (val) autoPassed.value = false;
+      },
+      { immediate: true },
+    );
+    watch(
+      paused,
+      (val) => {
+        const name = player.value?.name || '';
+        !val &&
+          player.value?.isTurn &&
+          startFlashTitle(`Tiến lên || ${name}`, '★ ★ IT IS YOUR TURN ★ ★');
+      },
+      { immediate: true },
+    );
+
+    return {
+      autoPassing,
+      canPass,
+      canPlay,
+      canStart,
+      doPass,
+      doPlay,
+      doStart,
+      hand,
+      onSelected,
+      ordinalisedWinPlace,
+      passed,
+      player,
+      showHand,
+      unfaced,
+      waiting,
+      winPlace,
+    };
   },
 });
 </script>
@@ -276,57 +258,6 @@ export default Vue.extend({
     color: black;
     padding: 2px 6px 2px 6px;
     border: 3px solid blue;
-  }
-}
-
-@media (max-width: 1100px) {
-  .viewport {
-    max-width: 100%;
-    max-height: 0;
-    min-height: 100%;
-    margin: 0;
-  }
-
-  .controls {
-    height: 35px;
-    margin-top: 0;
-
-    & h1 {
-      font-size: 1.5em;
-    }
-  }
-
-  .hand {
-    margin-top: 15px;
-
-    & .placed {
-      width: 60px;
-      height: 75px;
-
-      & .note {
-        margin-top: 25px;
-      }
-    }
-
-    & .unfaced {
-      margin-top: 30px;
-    }
-  }
-
-  .nameBar {
-    & .block {
-      width: 20px;
-      height: 20px;
-    }
-
-    & h3 {
-      font-size: 1em;
-    }
-  }
-
-  .note {
-    font-size: 1.1em;
-    padding-top: 6px;
   }
 }
 </style>

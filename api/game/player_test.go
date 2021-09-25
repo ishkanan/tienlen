@@ -21,10 +21,10 @@ func TestNextAvailablePosition(t *testing.T) {
 
 func TestNextTurnNoWins(t *testing.T) {
 	p := players{
-		&player{Position: 1, Hand: []card{card{}}},
-		&player{Position: 2, Hand: []card{card{}}},
-		&player{Position: 3, Hand: []card{card{}}, IsPassed: true},
-		&player{Position: 4, Hand: []card{card{}}},
+		&player{Position: 1, Hand: []card{{}}},
+		&player{Position: 2, Hand: []card{{}}},
+		&player{Position: 3, Hand: []card{{}}, IsPassed: true},
+		&player{Position: 4, Hand: []card{{}}},
 	}
 	assert.Equal(t, 2, p.NextTurn(p[0]).Position)
 	assert.Equal(t, 4, p.NextTurn(p[1]).Position)
@@ -34,10 +34,10 @@ func TestNextTurnNoWins(t *testing.T) {
 
 func TestNextTurnOneWinner(t *testing.T) {
 	p := players{
-		&player{Position: 1, Hand: []card{card{}}},
+		&player{Position: 1, Hand: []card{{}}},
 		&player{Position: 2, Hand: []card{}},
-		&player{Position: 3, Hand: []card{card{}}, IsPassed: true},
-		&player{Position: 4, Hand: []card{card{}}},
+		&player{Position: 3, Hand: []card{{}}, IsPassed: true},
+		&player{Position: 4, Hand: []card{{}}},
 	}
 	assert.Equal(t, 4, p.NextTurn(p[0]).Position)
 	assert.Equal(t, 4, p.NextTurn(p[1]).Position)
@@ -49,8 +49,8 @@ func TestNextTurnTwoWinners(t *testing.T) {
 	p := players{
 		&player{Position: 1, Hand: []card{}},
 		&player{Position: 2, Hand: []card{}},
-		&player{Position: 3, Hand: []card{card{}}},
-		&player{Position: 4, Hand: []card{card{}}},
+		&player{Position: 3, Hand: []card{{}}},
+		&player{Position: 4, Hand: []card{{}}},
 	}
 	assert.Equal(t, 3, p.NextTurn(p[0]).Position)
 	assert.Equal(t, 3, p.NextTurn(p[1]).Position)

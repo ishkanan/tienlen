@@ -1,21 +1,28 @@
 module.exports = {
   root: true,
   parserOptions: {
-    parser: '@typescript-eslint/parser',
+    ecmaVersion: 2020,
   },
   env: {
     node: true,
+    browser: true,
+    es6: true,
+  },
+  globals: {
+    google: true,
+    NodeJS: true,
   },
   extends: [
-    'eslint:recommended',
-    'plugin:@typescript-eslint/eslint-recommended',
-    'plugin:@typescript-eslint/recommended',
     'plugin:vue/recommended',
-    '@vue/typescript',
+    'eslint:recommended',
+    '@vue/typescript/recommended',
+    '@vue/prettier',
+    '@vue/prettier/@typescript-eslint',
   ],
   rules: {
+    'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
+    'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     semi: ['error', 'always'],
-    'no-console': 0,
     'no-multiple-empty-lines': ['error', { max: 1, maxEOF: 1 }],
     quotes: ['error', 'single', { avoidEscape: true, allowTemplateLiterals: true }],
     eqeqeq: 'error',
@@ -31,43 +38,37 @@ module.exports = {
     'space-infix-ops': 'error',
     'space-unary-ops': 'error',
     'no-multi-spaces': 'error',
+    'space-in-parens': 'error',
+    'no-var': 'error',
     'vue/eqeqeq': 'error',
-    'vue/max-attributes-per-line': [
-      2,
-      {
-        singleline: 8,
-        multiline: {
-          max: 1,
-          allowFirstLine: false,
-        },
-      },
-    ],
-    'vue/html-closing-bracket-spacing': [
-      'error',
-      { selfClosingTag: 'never' },
-    ],
     'vue/comma-dangle': ['error', 'always-multiline'],
     'vue/array-bracket-spacing': 'error',
     'vue/arrow-spacing': 'error',
-    'vue/component-name-in-template-casing': ['error', 'kebab-case'],
+    'vue/camelcase': 'error',
+    'vue/component-name-in-template-casing': [
+      'error',
+      'PascalCase',
+      {
+        registeredComponentsOnly: false,
+        ignores: ['/^ds-/', '/^svg:style/'],
+      },
+    ],
     'vue/key-spacing': 'error',
     'vue/object-curly-spacing': ['error', 'always'],
     'vue/space-infix-ops': 'error',
     'vue/space-unary-ops': 'error',
+    'vue/no-unused-components': 'warn',
+    'vue/no-unused-vars': 'warn',
     '@typescript-eslint/no-unused-vars': [
-      'error',
+      'warn',
       {
         argsIgnorePattern: '^_',
         ignoreRestSiblings: true,
       },
     ],
-    '@typescript-eslint/explicit-member-accessibility': [
-      'error',
-      { accessibility: 'no-public' },
-    ],
-    '@typescript-eslint/indent': ['error', 2],
-    '@typescript-eslint/no-empty-interface': 0,
+    '@typescript-eslint/explicit-member-accessibility': ['error', { accessibility: 'no-public' }],
     '@typescript-eslint/no-inferrable-types': 0,
+    '@typescript-eslint/no-empty-interface': 0,
     '@typescript-eslint/consistent-type-assertions': [
       'error',
       {
@@ -75,11 +76,6 @@ module.exports = {
         objectLiteralTypeAssertions: 'never',
       },
     ],
-    'vue/require-default-prop': 0,
-    'vue/singleline-html-element-content-newline': 0,
-    'vue/multiline-html-element-content-newline': 0,
-    '@typescript-eslint/camelcase': 0,
-    '@typescript-eslint/explicit-function-return-type': 0,
-    '@typescript-eslint/no-use-before-define': 0,
+    '@typescript-eslint/explicit-module-boundary-types': 0,
   },
 };

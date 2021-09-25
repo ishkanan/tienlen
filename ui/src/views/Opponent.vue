@@ -1,33 +1,28 @@
 <template>
-  <div
-    v-if="opponent"
-    :class="$style.viewport"
-  >
+  <div v-if="opponent" :class="$style.viewport">
     <div :class="$style.player">
       <span :class="$style.nameBar">
-        <ds-block-icon v-if="passed" :class="$style.block"/>
+        <BlockIcon v-if="passed" :class="$style.block" />
         <h3 :class="{ [$style.isTurn]: opponent.isTurn }">{{ opponent.name }}</h3>
       </span>
 
-      <div v-if="!opponent.connected" :class="$style.disconnected"/>
+      <div v-if="!opponent.connected" :class="$style.disconnected" />
 
       <div v-else-if="winPlace > 0" :class="$style.placed">
         <h2 :class="$style.note">{{ ordinalisedWinPlace }}</h2>
       </div>
 
-      <ds-card
+      <CardView
         v-else
         :class="$style.notMobile"
         :card="unfaced"
         :selectable="false"
         :show-face="false"
       >
-        <template v-slot:info>
-          <h1 v-if="opponent.cardsLeft > 0" :class="$style.note">
-            x {{ opponent.cardsLeft }}
-          </h1>
+        <template #info>
+          <h1 v-if="opponent.cardsLeft > 0" :class="$style.note">x {{ opponent.cardsLeft }}</h1>
         </template>
-      </ds-card>
+      </CardView>
 
       <h1 v-if="opponent.cardsLeft > 0" :class="[$style.note, $style.mobile]">
         x {{ opponent.cardsLeft }}
@@ -37,18 +32,15 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
+import { defineComponent, computed, watch } from '@vue/composition-api';
 import BlockIcon from '~/components/BlockIcon.vue';
 import CardView from '~/components/Card.vue';
-import { Card, Player, Suit } from '~/lib/models';
+import { Suit } from '~/lib/models';
 import { ordinalise, setTitle } from '~/lib/utils';
 import { game } from '~/store/game';
 
-export default Vue.extend({
-  components: {
-    'ds-block-icon': BlockIcon,
-    'ds-card': CardView,
-  },
+export default defineComponent({
+  components: { BlockIcon, CardView },
 
   props: {
     position: {
@@ -57,48 +49,49 @@ export default Vue.extend({
     },
   },
 
-  computed: {
-    unfaced(): Card {
+  setup(props) {
+    const opponent = computed(() => game.opponents.find((c) => c.position === props.position));
+    const unfaced = computed(() => {
       return {
-        suit: this.opponent?.isTurn ? Suit.Hearts : Suit.Spades,
+        suit: opponent.value?.isTurn ? Suit.Hearts : Suit.Spades,
         faceValue: 3,
         globalRank: 52,
         suitRank: 13,
       };
-    },
-    winPlace(): number {
-      const placed = game.winPlaces.findIndex(p => p.position === this.position);
+    });
+    const winPlace = computed(() => {
+      const placed = game.winPlaces.findIndex((p) => p.position === props.position);
       return placed === -1 ? 0 : placed + 1;
-    },
-    ordinalisedWinPlace(): string {
-      return ordinalise(this.winPlace);
-    },
-    opponent(): Player | undefined {
-      return game.opponents.find(c => c.position === this.position);
-    },
-    paused(): boolean {
-      return game.isPaused;
-    },
-    passed(): boolean {
-      return !!this.opponent && this.opponent.isPassed;
-    },
-  },
+    });
+    const ordinalisedWinPlace = computed(() => ordinalise(winPlace.value));
+    const paused = computed(() => game.isPaused);
+    const passed = computed(() => opponent.value?.isPassed ?? false);
 
-  watch: {
-    opponent: {
-      immediate: true,
-      handler(value: Player | undefined) {
-        const name = value?.name || '';
-        value?.isTurn && setTitle(`Tiến lên || ${name}`);
+    watch(
+      opponent,
+      (val) => {
+        const name = val?.name || '';
+        val?.isTurn && setTitle(`Tiến lên || ${name}`);
       },
-    },
-    paused: {
-      immediate: true,
-      handler(value: boolean) {
-        const name = this.opponent?.name || '';
-        !value && this.opponent?.isTurn && setTitle(`Tiến lên || ${name}`);
+      { immediate: true },
+    );
+
+    watch(
+      paused,
+      (val) => {
+        const name = opponent.value?.name || '';
+        !val && opponent.value?.isTurn && setTitle(`Tiến lên || ${name}`);
       },
-    },
+      { immediate: true },
+    );
+
+    return {
+      opponent,
+      ordinalisedWinPlace,
+      passed,
+      unfaced,
+      winPlace,
+    };
   },
 });
 </script>
@@ -116,10 +109,6 @@ export default Vue.extend({
   flex-direction: column;
   align-items: center;
   justify-content: center;
-
-  & .mobile {
-    display: none;
-  }
 
   & .notMobile {
     display: block;
@@ -162,7 +151,7 @@ export default Vue.extend({
   & .disconnected {
     width: 80px;
     height: 80px;
-    background: url(../assets/images/disconnected.png);
+    background: url(../assets/images/disconnected.gif);
     background-size: cover;
     background-repeat: no-repeat;
   }
@@ -181,53 +170,6 @@ export default Vue.extend({
       padding: 0px;
       width: 60%;
       margin: 40px auto auto auto;
-    }
-  }
-}
-
-@media (max-width: 1100px) {
-  .viewport {
-    width: 100%;
-    height: 100%;
-  }
-
-  .player {
-    flex-direction: row;
-    justify-content: space-between;
-
-    & .mobile {
-      display: block;
-    }
-
-    & .notMobile {
-      display: none;
-    }
-
-    & .nameBar {
-      & .block {
-        width: 20px;
-        height: 20px;
-      }
-    }
-
-    & h3 {
-      margin: 0;
-      font-size: 1.1em;
-    }
-
-    & .note {
-      font-size: 1.3em;
-      padding-top: 0px;
-    }
-
-    & .disconnected {
-      width: 35px;
-      height: 35px;
-    }
-
-    & .placed {
-      width: 30px;
-      height: 38px;
     }
   }
 }

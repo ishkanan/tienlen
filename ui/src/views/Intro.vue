@@ -2,45 +2,33 @@
   <div :class="$style.viewport">
     <h1>Welcome to Tiến lên online!</h1>
     <div :class="$style.controls">
-      <input
-        v-model="name"
-        type="text"
-        placeholder="Enter your name..."
-      >
-      <button :disabled="!notConnected" @click="connect">Connect</button>
+      <input v-model="name" type="text" placeholder="Enter your name..." />
+      <button :disabled="!disconnected" @click="handleConnect">Connect</button>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
+import { defineComponent, computed, ref } from '@vue/composition-api';
 import { joinGame } from '~/lib/socket';
 import { setTitle } from '~/lib/utils';
 import { game, ConnectionState } from '~/store/game';
 
-export default Vue.extend({
-  computed: {
-    name: {
-      get(): string {
-        return game.name;
-      },
-      set(value: string) {
-        game.name = value;
-      },
-    },
-    notConnected(): boolean {
-      return game.connState === ConnectionState.NotConnected;
-    },
+export default defineComponent({
+  setup() {
+    const name = ref('');
+    const disconnected = computed(() => game.connState === ConnectionState.NotConnected);
+
+    const handleConnect = () => {
+      game.name = name.value;
+      joinGame({ name: name.value });
+    };
+
+    return { name, disconnected, handleConnect };
   },
 
   created() {
     setTitle('Tiến lên (Thirteen)');
-  },
-
-  methods: {
-    connect() {
-      joinGame({ name: this.name });
-    },
   },
 });
 </script>
@@ -51,7 +39,7 @@ export default Vue.extend({
   height: 200px;
   background-color: rgba(48, 112, 16, 0.7);
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-  border: 4mm ridge rgba(170, 50, 50, .6);
+  border: 4mm ridge rgba(170, 50, 50, 0.6);
   border-radius: 8%;
   display: flex;
   flex-direction: column;
@@ -82,23 +70,6 @@ export default Vue.extend({
     &:disabled {
       background: gray;
       color: #585858;
-    }
-  }
-}
-
-@media (max-width: 1100px) {
-  .viewport {
-    width: 100%;
-    box-shadow: none;
-    border: 2mm ridge rgba(170, 50, 50, .6);
-    border-radius: 4%;
-
-    & h1 {
-      font-size: 1.6em;
-    }
-
-    & .controls {
-      height: 40px;
     }
   }
 }

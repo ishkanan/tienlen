@@ -121,25 +121,35 @@ func ConnectionHandler(game IMessageSource) func(w http.ResponseWriter, r *http.
 		sink := MessageSink{ConnID: connID, Connection: conn}
 
 		if !game.IsAcceptingConnections() {
-			sink.Send(errorResponse{Kind: errKindGameFull})
+			_ = sink.Send(errorResponse{Kind: errKindGameFull})
 			utils.LogDebug("ConnectionHandler:: %s tried to join, but game is full", connID.String())
 			return
 		}
 
 		game.ConnectionStateChanged(connID, sink, connStateNew)
+
+		var lastPingError error
 		conn.SetPongHandler(func(appData string) error {
 			go func() {
-				time.Sleep(10 * time.Second)
-				conn.WriteControl(websocket.PingMessage, nil, time.Now().Add(5*time.Second))
+				// sends one final ping after connection death, which is fine
+				time.Sleep(5 * time.Second)
+				lastPingError = conn.WriteControl(websocket.PingMessage, nil, time.Now().Add(5*time.Second))
 			}()
-			return nil
+			if lastPingError != nil {
+				utils.LogDebug("ConnectionHandler:: ping write error for %s - %v", connID.String(), err)
+			}
+			return lastPingError
 		})
-		conn.WriteControl(websocket.PingMessage, nil, time.Now().Add(5*time.Second))
+		err = conn.WriteControl(websocket.PingMessage, nil, time.Now().Add(5*time.Second))
+		if err != nil {
+			utils.LogDebug("ConnectionHandler:: initial ping write error for %s - %v", connID.String(), err)
+			game.ConnectionStateChanged(connID, sink, connStateDead)
+			return
+		}
 
 		var message Message
-
 		for {
-			err := conn.ReadJSON(&message)
+			err = conn.ReadJSON(&message)
 			if err != nil {
 				utils.LogDebug("ConnectionHandler:: read error for %s - %v", connID.String(), err)
 				game.ConnectionStateChanged(connID, sink, connStateDead)

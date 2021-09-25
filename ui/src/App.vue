@@ -1,29 +1,25 @@
 <template>
   <div id="app" :class="$style.app">
-    <ds-intro v-if="!connected"/>
-    <ds-game-table v-else/>
-    <ds-toaster/>
+    <Intro v-if="!connected" />
+    <Game v-else />
+    <Toaster />
   </div>
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
-import GameTable from '~/views/GameTable.vue';
+import { defineComponent, computed } from '@vue/composition-api';
+import Game from '~/views/Game.vue';
 import Intro from '~/views/Intro.vue';
 import Toaster from '~/views/Toaster.vue';
 import { game, ConnectionState } from '~/store/game';
 
-export default Vue.extend({
-  components: {
-    'ds-game-table': GameTable,
-    'ds-intro': Intro,
-    'ds-toaster': Toaster,
-  },
+export default defineComponent({
+  components: { Game, Intro, Toaster },
 
-  computed: {
-    connected(): boolean {
-      return game.connState === ConnectionState.Connected;
-    },
+  setup() {
+    const connected = computed(() => game.connState === ConnectionState.Connected);
+
+    return { connected };
   },
 });
 </script>
@@ -35,11 +31,5 @@ export default Vue.extend({
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-@media (max-width: 1100px) {
-  .app {
-    margin: auto;
-  }
 }
 </style>

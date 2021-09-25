@@ -1,23 +1,25 @@
 <template>
   <div :class="[$style.viewport, { [$style.winner]: previousWinner && inLobby }]">
-    <h1 v-if="paused" :class="$style.message">
-      Game is paused!
-    </h1>
+    <h1 v-if="paused" :class="$style.message">Game is paused!</h1>
     <template v-else-if="inLobby && previousWinner === undefined">
       <h1 v-if="needMorePlayers && !canStart" :class="$style.message">Wait for more players...</h1>
-      <h1 v-else-if="needMorePlayers && canStart" :class="$style.message">Wait for more players<br>or start the game...</h1>
+      <h1 v-else-if="needMorePlayers && canStart" :class="$style.message">
+        Wait for more players
+        <br />
+        or start the game...
+      </h1>
       <h1 v-else :class="$style.message">Start the game...</h1>
     </template>
     <template v-else>
       <div :class="$style.messageAndLastPlayed">
         <h2 v-if="inLobby && previousWinner" :class="$style.message">
-          {{ previousWinner.name }} won the game!
+          The game has finished! One more?
         </h2>
         <h2 v-else-if="lastPlayedCards.length > 0 && !!lastPlayed">
           {{ lastPlayed.name }} played:
         </h2>
         <div :class="$style.lastPlayed">
-          <ds-card
+          <CardView
             v-for="card in lastPlayedCards"
             :key="card.globalRank"
             :card="card"
@@ -31,41 +33,38 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
+import { defineComponent, computed } from '@vue/composition-api';
 import { sortBy } from 'lodash-es';
 import CardView from '~/components/Card.vue';
-import { Card, Player } from '~/lib/models';
 import { game } from '~/store/game';
 
-export default Vue.extend({
-  components: {
-    'ds-card': CardView,
-  },
+export default defineComponent({
+  components: { CardView },
 
-  computed: {
-    previousWinner(): Player | undefined {
-      if (game.self?.wonLastGame) return game.self;
-      return game.opponents.find(o => o.wonLastGame);
-    },
-    canStart(): boolean {
-      return this.inLobby && game.opponents.length > 0;
-    },
-    needMorePlayers(): boolean {
-      return game.opponents.length !== 3;
-    },
-    inLobby(): boolean {
-      return game.isInLobby;
-    },
-    paused(): boolean {
-      return game.isPaused;
-    },
-    lastPlayedCards(): Card[] {
-      return sortBy(game.lastPlayed || [], c => 52 - c.globalRank);
-    },
-    lastPlayed(): Player | undefined {
+  setup() {
+    const canStart = computed(() => inLobby.value && game.opponents.length > 0);
+    const inLobby = computed(() => game.isInLobby);
+    const lastPlayed = computed(() => {
       if (game.self?.lastPlayed) return game.self;
-      return game.opponents.find(o => o.lastPlayed);
-    },
+      return game.opponents.find((o) => o.lastPlayed);
+    });
+    const lastPlayedCards = computed(() => sortBy(game.lastPlayed || [], (c) => 52 - c.globalRank));
+    const needMorePlayers = computed(() => game.opponents.length !== 3);
+    const paused = computed(() => game.isPaused);
+    const previousWinner = computed(() => {
+      if (game.self?.wonLastGame) return game.self;
+      return game.opponents.find((o) => o.wonLastGame);
+    });
+
+    return {
+      canStart,
+      inLobby,
+      lastPlayed,
+      lastPlayedCards,
+      needMorePlayers,
+      paused,
+      previousWinner,
+    };
   },
 });
 </script>
@@ -109,21 +108,5 @@ export default Vue.extend({
   font-size: 40px;
   text-align: center;
   text-transform: uppercase;
-}
-
-@media (max-width: 1100px) {
-  .viewport {
-    border-radius: 0;
-    flex-wrap: wrap;
-    margin: 20px 0 0 0;
-
-    & h1 {
-      font-size: 1.6em;
-    }
-
-    & h2 {
-      font-size: 1.3em;
-    }
-  }
 }
 </style>
