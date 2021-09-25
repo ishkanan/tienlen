@@ -171,12 +171,13 @@ func (g *Game) processResetGameRequest(connID string) {
 
 	if thePlayer.Position != 1 {
 		g.sendOnConnection(connID, errorResponse{Kind: errKindNotAuthorised})
-		utils.LogDebug("processStartGameRequest: Unauthorised attempt by %s", thePlayer.Name)
+		utils.LogDebug("processResetGameRequest: Unauthorised attempt by %s", thePlayer.Name)
 		return
 	}
 
 	g.state = gameStateInLobby
 	g.firstRound = true
+	g.players = g.players.DeleteDisconnected()
 	g.winPlaces = make(players, 0, 3)
 	g.setNewRound()
 	g.players.ResetAllGameStatuses()

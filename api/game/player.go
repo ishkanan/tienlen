@@ -33,6 +33,17 @@ func (p players) GetByName(name string) *player {
 	return nil
 }
 
+// DeleteDisconnected removes all disconnected players
+func (p players) DeleteDisconnected() players {
+	kept := players{}
+	for _, player := range p {
+		if player.Connected {
+			kept = append(kept, player)
+		}
+	}
+	return kept
+}
+
 // DeleteByName remove a player by their name
 func (p players) DeleteByName(name string) players {
 	kept := players{}
