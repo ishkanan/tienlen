@@ -45,14 +45,6 @@ module.exports = {
     'vue/array-bracket-spacing': 'error',
     'vue/arrow-spacing': 'error',
     'vue/camelcase': 'error',
-    'vue/component-name-in-template-casing': [
-      'error',
-      'PascalCase',
-      {
-        registeredComponentsOnly: false,
-        ignores: ['/^ds-/', '/^svg:style/'],
-      },
-    ],
     'vue/key-spacing': 'error',
     'vue/object-curly-spacing': ['error', 'always'],
     'vue/space-infix-ops': 'error',
@@ -77,5 +69,6 @@ module.exports = {
       },
     ],
     '@typescript-eslint/explicit-module-boundary-types': 0,
+    '@typescript-eslint/ban-ts-comment': 0,
   },
 };

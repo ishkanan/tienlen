@@ -15,7 +15,7 @@ var uiFolder = flag.String("ui", "dist", "Folder container UI files")
 
 func main() {
 	fmt.Println("Tiến lên (aka. Thirteen) server\n" +
-		"  A simple online server implementation of the popular Vietnamese card game.\n",
+		"  A simple server implementation of the popular Vietnamese card game.\n",
 	)
 
 	flag.Parse()

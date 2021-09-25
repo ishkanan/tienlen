@@ -73,6 +73,10 @@ func buildRequest(ident string, data []byte) (interface{}, error) {
 		request := startGameRequest{}
 		err := json.Unmarshal(data, &request)
 		return request, err
+	case "RESET_GAME":
+		request := resetGameRequest{}
+		err := json.Unmarshal(data, &request)
+		return request, err
 	case "TURN_PASS":
 		request := turnPassRequest{}
 		err := json.Unmarshal(data, &request)
@@ -94,6 +98,7 @@ func responseMap() map[reflect.Type]string {
 		reflect.TypeOf(gameStartedResponse{}):        "GAME_STARTED",
 		reflect.TypeOf(gamePausedResponse{}):         "GAME_PAUSED",
 		reflect.TypeOf(gameResumedResponse{}):        "GAME_RESUMED",
+		reflect.TypeOf(gameResetResponse{}):          "GAME_RESET",
 		reflect.TypeOf(turnPassedResponse{}):         "TURN_PASSED",
 		reflect.TypeOf(roundWonResponse{}):           "ROUND_WON",
 		reflect.TypeOf(turnPlayedResponse{}):         "TURN_PLAYED",

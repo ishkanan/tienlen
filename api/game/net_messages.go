@@ -83,6 +83,14 @@ type gameStateRefreshResponse struct {
 	WinPlaces  []player  `json:"winPlaces"`
 }
 
+// requests a full game state reset
+type resetGameRequest struct{}
+
+// informs all players that a reset occurred
+type gameResetResponse struct {
+	Player player `json:"player"`
+}
+
 type errorKind int
 
 const (

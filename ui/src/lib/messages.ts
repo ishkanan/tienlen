@@ -55,6 +55,12 @@ export interface GameWonResponse {
   player: Player;
 }
 
+export interface ResetGameRequest {}
+
+export interface GameResetResponse {
+  player: Player;
+}
+
 export enum GameState {
   InLobby = 1,
   Running = 2,

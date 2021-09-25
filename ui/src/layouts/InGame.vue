@@ -4,11 +4,14 @@
       <slot name="gameTable" />
     </div>
     <div :class="$style.headsUp">
-      <div :class="$style.scoreTable">
-        <slot name="scoreTable" />
+      <div :class="$style.scoreArea">
+        <slot name="scoreArea" />
       </div>
-      <div :class="$style.activityTable">
-        <slot name="activityTable" />
+      <div :class="$style.controlsArea">
+        <slot name="controlsArea" />
+      </div>
+      <div :class="$style.activityArea">
+        <slot name="activityArea" />
       </div>
     </div>
   </div>
@@ -44,14 +47,21 @@ export default defineComponent({});
   justify-content: space-between;
   margin: 15px auto 0 auto;
 
-  & .scoreTable {
-    width: 550px;
+  & .scoreArea {
+    width: 510px;
     height: 200px;
     background-color: rgba(255, 255, 255, 0.6);
-    border: 3px black dashed;
+    border: 3px black double;
   }
 
-  & .activityTable {
+  & .controlsArea {
+    width: 170px;
+    height: 200px;
+    background-color: rgba(50, 50, 50, 0.8);
+    border: 3px black double;
+  }
+
+  & .activityArea {
     width: 800px;
     height: 250px;
     background-color: rgba(50, 50, 50, 0.8);

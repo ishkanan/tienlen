@@ -1,6 +1,7 @@
 package game
 
 import (
+	"fmt"
 	"reflect"
 	"strings"
 	"sync"
@@ -19,6 +20,7 @@ const (
 	gameStateInLobby gameState = 1
 	gameStateRunning gameState = 2
 	gameStatePaused  gameState = 3
+	maxNameLength              = 35
 )
 
 type context struct {
@@ -86,6 +88,8 @@ func (g *Game) ConnectionStateChanged(connUUID uuid.UUID, conn IMessageSink, sta
 		g.sendToAllPlayers(playerDisconnectedResponse{Player: *player})
 		utils.LogInfo("ConnectionStateChanged: %s has disconnected", player.Name)
 		if g.state == gameStateInLobby {
+			g.winPlaces = make(players, 0, 3)
+			g.placedRound = false
 			g.players.ResetScores()
 			// no need to keep place for player if game hasn't started
 			g.players = g.players.DeleteByName(player.Name)
@@ -118,6 +122,11 @@ func (g *Game) ProcessRequest(connUUID uuid.UUID, request interface{}, requestTy
 	defer g.mutex.Unlock()
 
 	connID := connUUID.String()
+
+	if requestType == reflect.TypeOf(resetGameRequest{}) {
+		g.processResetGameRequest(connID)
+		return
+	}
 
 	if requestType == reflect.TypeOf(joinGameRequest{}) {
 		req := request.(joinGameRequest)
@@ -157,6 +166,30 @@ func (g *Game) ProcessRequest(connUUID uuid.UUID, request interface{}, requestTy
 	}
 }
 
+func (g *Game) processResetGameRequest(connID string) {
+	thePlayer := g.connections[connID].Player
+
+	if thePlayer.Position != 1 {
+		g.sendOnConnection(connID, errorResponse{Kind: errKindNotAuthorised})
+		utils.LogDebug("processStartGameRequest: Unauthorised attempt by %s", thePlayer.Name)
+		return
+	}
+
+	g.state = gameStateInLobby
+	g.firstRound = true
+	g.winPlaces = make(players, 0, 3)
+	g.setNewRound()
+	g.players.ResetAllGameStatuses()
+	for _, player := range g.players {
+		player.Hand = []card{}
+		player.CardsLeft = 0
+	}
+
+	g.sendStateToAllPlayers()
+	g.sendToAllPlayers(gameResetResponse{Player: *thePlayer})
+	utils.LogInfo("processResetGameRequest: %s has reset the game", thePlayer.Name)
+}
+
 func (g *Game) processJoinGameRequest(connID string, req joinGameRequest) {
 	thePlayer := g.players.GetByName(req.PlayerName)
 
@@ -177,6 +210,10 @@ func (g *Game) processJoinGameRequest(connID string, req joinGameRequest) {
 		}
 		position := g.players.NextAvailablePosition()
 		name := strings.TrimSpace(req.PlayerName)
+		if len(name) > maxNameLength {
+			name = name[0:maxNameLength]
+		}
+		fmt.Println("NAME: " + name)
 		if g.players.GetByName(name) != nil {
 			g.sendOnConnection(connID, errorResponse{Kind: errKindNameTaken})
 			g.connections[connID].Connection.Close()
@@ -193,6 +230,8 @@ func (g *Game) processJoinGameRequest(connID string, req joinGameRequest) {
 		g.players = append(g.players, thePlayer)
 		g.players.ResetAllGameStatuses()
 		g.players.ResetScores()
+		g.winPlaces = make(players, 0, 3)
+		g.placedRound = false
 	}
 
 	thePlayer.Connected = true

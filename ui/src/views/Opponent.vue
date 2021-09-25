@@ -23,10 +23,6 @@
           <h1 v-if="opponent.cardsLeft > 0" :class="$style.note">x {{ opponent.cardsLeft }}</h1>
         </template>
       </CardView>
-
-      <h1 v-if="opponent.cardsLeft > 0" :class="[$style.note, $style.mobile]">
-        x {{ opponent.cardsLeft }}
-      </h1>
     </div>
   </div>
 </template>
