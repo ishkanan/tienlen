@@ -4,7 +4,7 @@
     <ConfirmDialog
       v-if="showConfirm"
       title="Are you sure?"
-      message="This will reset EVERYTHING!"
+      message="This will reset EVERYTHING and remove all disconnected players!"
       @confirm="handleConfirm"
     />
   </div>

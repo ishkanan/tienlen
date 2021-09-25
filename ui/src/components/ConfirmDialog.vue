@@ -75,7 +75,7 @@ export default defineComponent({
   --overlay-background-color: #0000004a;
   --container-box-shadow: #0000004a 0px 3px 8px 0px;
   --base-background-color: #ffffff;
-  --button-color: #4083ff;
+  --button-color: black;
   --button-background-color: #ffffff;
   --button-border-color: #e0e0e0;
   --button-background-color-disabled: #f5f5f5;
@@ -83,10 +83,10 @@ export default defineComponent({
   --button-box-shadow-active: inset 0 2px 0px 0px #00000014;
   --input-background-color: #ebebeb;
   --input-background-color-hover: #dfdfdf;
-  --font-size-m: 20px;
-  --font-size-s: 16px;
-  --font-weight-black: 900;
-  --font-weight-bold: 700;
+  --font-size-m: 24px;
+  --font-size-s: 18px;
+  --font-weight-black: 1100;
+  --font-weight-bold: 600;
   --font-weight-medium: 500;
   --font-weight-normal: 400;
   --font-weight-light: 300;
@@ -113,7 +113,7 @@ export default defineComponent({
   text-align: center;
   font-size: var(--font-size-m);
   line-height: initial;
-  margin-bottom: 5px;
+  margin-bottom: 15px;
 }
 .text {
   color: var(--message-color);
@@ -141,14 +141,14 @@ export default defineComponent({
 .container {
   background-color: var(--base-background-color);
   border-radius: 1rem;
-  width: 286px;
+  width: 400px;
   height: auto;
   display: grid;
   grid-template-rows: 1fr max-content;
   box-shadow: var(--container-box-shadow);
 }
 .textgrid {
-  padding: 1rem;
+  padding: 1.2rem;
 }
 .btngrid {
   width: 100%;
@@ -157,18 +157,14 @@ export default defineComponent({
   border-radius: 0 0 1rem 1rem;
   overflow: hidden;
 }
-.btngrid.isMono {
-  grid-template-columns: 1fr;
-}
 .btn {
   border-radius: 0 0 1rem 0;
   color: var(--button-color);
   background-color: var(--button-background-color);
   border: 0;
-  font-size: 1rem;
+  font-size: 1.1rem;
   border-top: 1px solid var(--button-border-color);
   cursor: pointer;
-  font-weight: var(--font-weight-bold);
   outline: none;
   min-height: 50px;
 }
@@ -184,22 +180,6 @@ export default defineComponent({
 .btnleft {
   border-radius: 0;
   border-right: 1px solid var(--button-border-color);
-}
-.input[type='password'] {
-  width: 100%;
-  outline: none;
-  border-radius: 8px;
-  height: 35px;
-  border: 0;
-  margin: 5px 0;
-  background-color: var(--input-background-color);
-  padding: 0 0.5rem;
-  font-size: var(--font-size-m);
-  transition: 0.21s ease;
-}
-.input[type='password']:hover,
-.input[type='password']:focus {
-  background-color: var(--input-background-color-hover);
 }
 /**
 * Transition
