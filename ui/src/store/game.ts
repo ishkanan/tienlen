@@ -4,6 +4,7 @@ import {
   ErrorKind,
   ErrorResponse,
   GamePausedResponse,
+  GameResetResponse,
   GameResumedResponse,
   GameStartedResponse,
   GameState,
@@ -203,6 +204,14 @@ class Game extends VuexModule {
     this.pushEvent({
       severity: EventSeverity.Info,
       runes: [{ message: `${response.player.name} has won the game.` }],
+    });
+  }
+
+  @Action
+  gameReset({ response }: { response: GameResetResponse }) {
+    this.pushEvent({
+      severity: EventSeverity.Warning,
+      runes: [{ message: `${response.player.name} has reset the game. Dick move?` }],
     });
   }
 

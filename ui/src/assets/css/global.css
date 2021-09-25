@@ -9,6 +9,7 @@ body {
 }
 
 button {
+  cursor: pointer;
   border: 0;
   line-height: 2.5;
   padding: 0 20px;
@@ -41,6 +42,11 @@ button.danger {
 
 button.danger:hover {
   background-color: rgba(250, 0, 0, 1);
+}
+
+button:disabled {
+  cursor: default;
+  background-color: rgba(200, 200, 200);
 }
 
 @media (max-width: 1100px) {

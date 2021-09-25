@@ -6,6 +6,7 @@ import {
   StartGameRequest,
   TurnPassRequest,
   TurnPlayRequest,
+  ResetGameRequest,
 } from './messages';
 
 const wsUrl =
@@ -44,6 +45,14 @@ export function requestStartGame(): void {
   });
 }
 
+export function requestResetGame(): void {
+  const request: ResetGameRequest = {};
+  sendMessage({
+    kind: 'RESET_GAME',
+    request,
+  });
+}
+
 export function requestTurnPass(): void {
   const request: TurnPassRequest = {};
   sendMessage({
@@ -65,7 +74,12 @@ function sendMessage({
   request,
 }: {
   kind: string;
-  request: JoinGameRequest | StartGameRequest | TurnPassRequest | TurnPlayRequest;
+  request:
+    | JoinGameRequest
+    | StartGameRequest
+    | TurnPassRequest
+    | TurnPlayRequest
+    | ResetGameRequest;
 }) {
   if (!socket || game.connState !== ConnectionState.Connected) return;
   const message: Message = {
@@ -75,13 +89,14 @@ function sendMessage({
   socket.send(JSON.stringify(message));
 }
 
-// @ts-ignore
+// eslint-disable-next-line
 const actions: Record<string, any> = {
   PLAYER_JOINED: game.playerJoined,
   PLAYER_DISCONNECTED: game.playerDisconnected,
   GAME_STARTED: game.gameStarted,
   GAME_PAUSED: game.gamePaused,
   GAME_RESUMED: game.gameResumed,
+  GAME_RESET: game.gameReset,
   TURN_PASSED: game.turnPassed,
   ROUND_WON: game.roundWon,
   TURN_PLAYED: game.turnPlayed,

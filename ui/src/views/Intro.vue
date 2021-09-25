@@ -2,8 +2,8 @@
   <div :class="$style.viewport">
     <h1>Welcome to Tiến lên online!</h1>
     <div :class="$style.controls">
-      <input v-model="name" type="text" placeholder="Enter your name..." />
-      <button :disabled="!disconnected" @click="handleConnect">Connect</button>
+      <input v-model="name" type="text" maxlength="35" placeholder="Enter your name..." />
+      <button :disabled="!canSubmit" @click="handleConnect">Connect</button>
     </div>
   </div>
 </template>
@@ -17,18 +17,25 @@ import { game, ConnectionState } from '~/store/game';
 export default defineComponent({
   setup() {
     const name = ref('');
+    const nameLatin1Check = /[\u0020-\u007e\u00C0-\u00ff]+/g;
+    const validName = computed(() => {
+      const matches = name.value.match(nameLatin1Check);
+      return (matches ?? []).length === 1 || name.value.length === 0;
+    });
     const disconnected = computed(() => game.connState === ConnectionState.NotConnected);
+    const canSubmit = computed(() => validName.value && disconnected.value);
 
     const handleConnect = () => {
       game.name = name.value;
       joinGame({ name: name.value });
     };
 
-    return { name, disconnected, handleConnect };
+    return { name, canSubmit, handleConnect };
   },
 
-  created() {
+  mounted() {
     setTitle('Tiến lên (Thirteen)');
+    game.events = [];
   },
 });
 </script>

@@ -36,10 +36,13 @@
         </template>
       </FourPlayerLayout>
     </template>
-    <template #scoreTable>
+    <template #scoreArea>
       <ScoreView />
     </template>
-    <template #activityTable>
+    <template #controlsArea>
+      <ControlsView />
+    </template>
+    <template #activityArea>
       <ActivityView />
     </template>
   </InGameLayout>
@@ -56,6 +59,7 @@ import { Player } from '~/lib/models';
 import { setTitle } from '~/lib/utils';
 import { game } from '~/store/game';
 import ActivityView from '~/views/Activity.vue';
+import ControlsView from '~/views/Controls.vue';
 import DiscardView from '~/views/Discard.vue';
 import OpponentView from '~/views/Opponent.vue';
 import PlayerView from '~/views/Player.vue';
@@ -69,6 +73,7 @@ export default defineComponent({
     ThreePlayerLayout,
     FourPlayerLayout,
     ActivityView,
+    ControlsView,
     DiscardView,
     OpponentView,
     PlayerView,
