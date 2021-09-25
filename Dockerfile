@@ -5,17 +5,16 @@
 # Note these things:
 # - app is exposed on port 26000 (cannot be changed)
 
-FROM golang:1.14 AS build_api
+FROM golang:1.17 AS build_api
 WORKDIR /go/src/github.com/ishkanan/tienlen
-RUN go get -u github.com/alecthomas/gometalinter && \
-    gometalinter -i
 COPY api api
 RUN cd api && \
     GOOS=linux go build -o /tmp/tienlen-server main.go && \
     go test ./... && \
-    gometalinter --deadline=10m --config=linter.json ./...
+    curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.40.1 && \
+    golangci-lint run
 
-FROM node:14.5.0 AS build_ui
+FROM node:15.4.0 AS build_ui
 COPY ui/ .
 RUN NODE_ENV= npm ci && \
     npm run build
