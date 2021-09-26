@@ -61,6 +61,15 @@ export interface GameResetResponse {
   player: Player;
 }
 
+export interface ChangeNameRequest {
+  name: string;
+}
+
+export interface NameChangedResponse {
+  oldPlayer: Player;
+  newPlayer: Player;
+}
+
 export enum GameState {
   InLobby = 1,
   Running = 2,
@@ -87,7 +96,7 @@ export enum ErrorKind {
   InvalidPattern = 6,
   CardsNotBetter = 7,
   MustPlayLowest = 8,
-  NameTaken = 9,
+  InvalidName = 9,
   GameFull = 10,
 }
 

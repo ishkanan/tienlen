@@ -2,7 +2,7 @@
   <div v-if="player" :class="$style.viewport">
     <div :class="$style.controls">
       <button v-if="canStart" @click="doStart">Start game</button>
-      <button v-if="canPlay" @click="doPlay">Play cards</button>
+      <button v-if="canPlay" :disabled="!cardsSelected" @click="doPlay">Play cards</button>
       <button v-if="canPass" class="danger" @click="doPass">Pass turn</button>
       <h2 v-if="autoPassing">Your turn will be automatically passed...</h2>
       <h2 v-if="waiting">Waiting for turn...</h2>
@@ -78,6 +78,7 @@ export default defineComponent({
         !autoPassing.value &&
         !autoPassed.value,
     );
+    const cardsSelected = computed(() => selectedRanks.value.length > 0);
     const showHand = computed(() => game.isInProgress && winPlace.value === 0);
     const hand = computed(() => game.selfHand);
     const unfaced = computed(() => {
@@ -158,6 +159,7 @@ export default defineComponent({
       autoPassing,
       canPass,
       canPlay,
+      cardsSelected,
       canStart,
       doPass,
       doPlay,

@@ -5,17 +5,25 @@
         <div :class="$style.container">
           <span :class="$style.textgrid">
             <h4 v-if="title" :class="$style.title">{{ title }}</h4>
-            <p v-if="message" :class="$style.text">{{ message }}</p>
+            <p v-if="message" :class="$style.message">{{ message }}</p>
+            <input
+              v-model="name"
+              :class="$style.input"
+              type="text"
+              maxlength="35"
+              placeholder="Enter something..."
+            />
           </span>
           <div :class="$style.btngrid">
             <button
               :class="[$style.btn, $style.btnleft]"
+              :disabled="!validName"
               @click.stop="(e) => handleClickButton(e, true)"
             >
-              {{ yesButtonText }}
+              {{ confirmButtonText }}
             </button>
             <button :class="$style.btn" @click.stop="(e) => handleClickButton(e, false)">
-              {{ noButtonText }}
+              {{ cancelButtonText }}
             </button>
           </div>
         </div>
@@ -25,7 +33,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from '@vue/composition-api';
+import { defineComponent, computed, ref } from '@vue/composition-api';
 
 interface event {
   target?: {
@@ -37,33 +45,40 @@ export default defineComponent({
   props: {
     title: {
       type: String,
-      default: 'Confirm',
+      default: 'Input',
     },
     message: {
       type: String,
       default: '',
     },
-    yesButtonText: {
+    default: {
       type: String,
-      default: 'Yes',
+      default: '',
     },
-    noButtonText: {
+    confirmButtonText: {
       type: String,
-      default: 'No',
+      default: 'Confirm',
+    },
+    cancelButtonText: {
+      type: String,
+      default: 'Cancel',
     },
   },
 
-  setup(_, { emit }) {
+  setup(props, { emit }) {
+    const name = ref(props.default);
+    const validName = computed(() => name.value !== props.default && name.value !== '');
+
     const handleClickButton = (event: event, confirm: boolean) => {
       if (event.target?.id === 'vueConfirm') return;
-      emit('confirm', confirm);
+      emit('confirm', confirm, name.value);
     };
 
     const handleClickOverlay = (event: event) => {
-      if (event.target?.id === 'vueConfirm') emit('confirm', false);
+      if (event.target?.id === 'vueConfirm') emit('confirm', false, name.value);
     };
 
-    return { handleClickButton, handleClickOverlay };
+    return { name, validName, handleClickButton, handleClickOverlay };
   },
 });
 </script>
@@ -116,7 +131,7 @@ export default defineComponent({
   line-height: initial;
   margin-bottom: 15px;
 }
-.text {
+.message {
   color: var(--message-color);
   padding: 0 1rem;
   width: 100%;
@@ -124,6 +139,13 @@ export default defineComponent({
   text-align: center;
   font-size: var(--font-size-s);
   line-height: initial;
+}
+.input {
+  width: 100%;
+  border-radius: 5px;
+  padding: 10px;
+  font-size: var(--font-size-s);
+  transition: all ease-in-out 0.2s;
 }
 .overlay {
   background-color: var(--overlay-background-color);

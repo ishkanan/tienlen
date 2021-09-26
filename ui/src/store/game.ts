@@ -10,6 +10,7 @@ import {
   GameState,
   GameStateRefreshResponse,
   GameWonResponse,
+  NameChangedResponse,
   PlayerDisconnectedResponse,
   PlayerJoinedResponse,
   PlayerPlacedResponse,
@@ -74,9 +75,9 @@ class Game extends VuexModule {
       message: 'You must play your lowest card.',
       toast: false,
     },
-    [ErrorKind.NameTaken]: {
-      message: 'That name is already taken.',
-      toast: true,
+    [ErrorKind.InvalidName]: {
+      message: 'That name is not valid.',
+      toast: (context: this) => context.connState === ConnectionState.NotConnected,
     },
     [ErrorKind.GameFull]: {
       message: 'The game is full.',
@@ -200,6 +201,14 @@ class Game extends VuexModule {
   }
 
   @Action
+  nameChanged({ response }: { response: NameChangedResponse }) {
+    this.pushEvent({
+      severity: EventSeverity.Info,
+      runes: [{ message: `${response.oldPlayer.name} is now known as ${response.newPlayer.name}` }],
+    });
+  }
+
+  @Action
   gameWon({ response }: { response: GameWonResponse }) {
     this.pushEvent({
       severity: EventSeverity.Info,
@@ -233,7 +242,11 @@ class Game extends VuexModule {
     this.pushEvent({
       severity: EventSeverity.Error,
       runes: [{ message: this.errorMap[response.kind].message }],
-      toast: this.errorMap[response.kind].toast,
+      toast: (function (context) {
+        const t = context.errorMap[response.kind].toast;
+        if (typeof t === 'boolean') return t;
+        return t(context);
+      })(this),
     });
   }
 

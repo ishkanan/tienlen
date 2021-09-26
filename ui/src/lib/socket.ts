@@ -7,6 +7,7 @@ import {
   TurnPassRequest,
   TurnPlayRequest,
   ResetGameRequest,
+  ChangeNameRequest,
 } from './messages';
 
 const wsUrl =
@@ -69,6 +70,14 @@ export function requestTurnPlay({ cards }: { cards: Card[] }): void {
   });
 }
 
+export function requestChangeName({ name }: { name: string }): void {
+  const request: ChangeNameRequest = { name };
+  sendMessage({
+    kind: 'CHANGE_NAME',
+    request,
+  });
+}
+
 function sendMessage({
   kind,
   request,
@@ -79,7 +88,8 @@ function sendMessage({
     | StartGameRequest
     | TurnPassRequest
     | TurnPlayRequest
-    | ResetGameRequest;
+    | ResetGameRequest
+    | ChangeNameRequest;
 }) {
   if (!socket || game.connState !== ConnectionState.Connected) return;
   const message: Message = {
@@ -100,6 +110,7 @@ const actions: Record<string, any> = {
   TURN_PASSED: game.turnPassed,
   ROUND_WON: game.roundWon,
   TURN_PLAYED: game.turnPlayed,
+  NAME_CHANGED: game.nameChanged,
   PLAYER_PLACED: game.playerPlaced,
   GAME_WON: game.gameWon,
   GAME_STATE_REFRESH: game.gameStateRefresh,
