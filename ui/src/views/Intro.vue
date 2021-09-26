@@ -73,11 +73,6 @@ export default defineComponent({
     font-size: 18px;
     margin-right: 20px;
     transition: all ease-in-out 0.2s;
-
-    &:disabled {
-      background: gray;
-      color: #585858;
-    }
   }
 }
 </style>

@@ -1,10 +1,6 @@
 package game
 
-import (
-	"fmt"
-	"math/rand"
-	"time"
-)
+import "strings"
 
 // represents a player in the game
 type player struct {
@@ -25,8 +21,9 @@ type players []*player
 
 // GetByName gets a pointer to the player with matching name
 func (p players) GetByName(name string) *player {
+	name = strings.ToLower(name)
 	for i := range p {
-		if p[i].Name == name {
+		if strings.ToLower(p[i].Name) == name {
 			return p[i]
 		}
 	}
@@ -137,20 +134,6 @@ func (p players) NextAvailablePosition() int {
 
 var firstNames = []string{"Awesome", "Big", "Small", "Smart", "Good", "Great", "Adorable", "Fancy", "Witty", "Fast", "Eager", "Nice", "Lively", "Gifted", "Red", "Cute", "Clever", "Crazy", "Calm", "Cunning"}
 var lastNames = []string{"Dog", "Cat", "Lion", "Eagle", "Bird", "Panda", "Fish", "Bear", "Hedgehog", "Quail", "Chicken", "Ant", "Bug", "Beetle", "Zebra", "Horse"}
-
-// TheyWhoNotBeNamed generates a new random name for a nameless player
-func (p players) TheyWhoNotBeNamed() string {
-	rand.Seed(time.Now().UnixNano())
-	for {
-		name := fmt.Sprintf("%v %v",
-			firstNames[rand.Intn(len(firstNames))],
-			lastNames[rand.Intn(len(lastNames))],
-		)
-		if p.GetByName(name) == nil {
-			return name
-		}
-	}
-}
 
 // SetLastPlayed sets the last played flag on the designated player and clears
 // it on the others. If "to" is nil, flag is cleared on all players.

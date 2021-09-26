@@ -15,7 +15,7 @@ button {
   padding: 0 20px;
   font-size: 1rem;
   text-align: center;
-  color: #fff;
+  color: white;
   text-shadow: 1px 1px 1px #000;
   border-radius: 10px;
   background-color: rgba(0, 0, 200, 1);
@@ -47,6 +47,7 @@ button.danger:hover {
 button:disabled {
   cursor: default;
   background-color: rgba(200, 200, 200);
+  color: white;
 }
 
 @media (max-width: 1100px) {

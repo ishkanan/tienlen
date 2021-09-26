@@ -100,7 +100,7 @@ export default defineComponent({
       }, []);
     });
 
-    const canStart = computed(() => !game.isInProgress && game.opponents.length > 0);
+    const canStart = computed(() => !game.isInProgress);
     watch(
       canStart,
       (val) => {

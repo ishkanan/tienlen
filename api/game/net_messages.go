@@ -91,6 +91,17 @@ type gameResetResponse struct {
 	Player player `json:"player"`
 }
 
+// requests a player name change
+type changeNameRequest struct {
+	PlayerName string `json:"name"`
+}
+
+// informs all players that a name change occurred
+type nameChangedResponse struct {
+	OldPlayer player `json:"oldPlayer"`
+	NewPlayer player `json:"newPlayer"`
+}
+
 type errorKind int
 
 const (
@@ -102,7 +113,7 @@ const (
 	errKindInvalidPattern errorKind = 6
 	errKindCardsNotBetter errorKind = 7
 	errKindMustPlayLowest errorKind = 8
-	errKindNameTaken      errorKind = 9
+	errKindInvalidName    errorKind = 9
 	errKindGameFull       errorKind = 10
 )
 

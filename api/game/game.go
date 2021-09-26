@@ -1,9 +1,7 @@
 package game
 
 import (
-	"fmt"
 	"reflect"
-	"strings"
 	"sync"
 
 	"github.com/google/uuid"
@@ -145,6 +143,12 @@ func (g *Game) ProcessRequest(connUUID uuid.UUID, request interface{}, requestTy
 		return
 	}
 
+	if requestType == reflect.TypeOf(changeNameRequest{}) {
+		req := request.(changeNameRequest)
+		g.processChangeNameRequest(connID, req)
+		return
+	}
+
 	if g.state != gameStateRunning {
 		g.sendOnConnection(connID, errorResponse{Kind: errKindNotAuthorised})
 		return
@@ -163,17 +167,12 @@ func (g *Game) ProcessRequest(connUUID uuid.UUID, request interface{}, requestTy
 	if requestType == reflect.TypeOf(turnPlayRequest{}) {
 		req := request.(turnPlayRequest)
 		g.processTurnPlayRequest(connID, req)
+		return
 	}
 }
 
 func (g *Game) processResetGameRequest(connID string) {
 	thePlayer := g.connections[connID].Player
-
-	if thePlayer.Position != 1 {
-		g.sendOnConnection(connID, errorResponse{Kind: errKindNotAuthorised})
-		utils.LogDebug("processResetGameRequest: Unauthorised attempt by %s", thePlayer.Name)
-		return
-	}
 
 	g.state = gameStateInLobby
 	g.firstRound = true
@@ -210,19 +209,15 @@ func (g *Game) processJoinGameRequest(connID string, req joinGameRequest) {
 			return
 		}
 		position := g.players.NextAvailablePosition()
-		name := strings.TrimSpace(req.PlayerName)
-		if len(name) > maxNameLength {
-			name = name[0:maxNameLength]
-		}
-		fmt.Println("NAME: " + name)
+		name := cleanPlayerName(req.PlayerName, g.players, maxNameLength)
 		if g.players.GetByName(name) != nil {
-			g.sendOnConnection(connID, errorResponse{Kind: errKindNameTaken})
+			g.sendOnConnection(connID, errorResponse{Kind: errKindInvalidName})
 			g.connections[connID].Connection.Close()
 			utils.LogInfo("processJoinGameRequest: %s tried to use name %s, but it's taken", connID, name)
 			return
 		}
 		if name == "" {
-			name = g.players.TheyWhoNotBeNamed()
+			name = theyWhoNotBeNamed(g.players, maxNameLength)
 		}
 		thePlayer = &player{
 			Name:     name,
@@ -418,6 +413,22 @@ func (g *Game) processTurnPlayRequest(connID string, req turnPlayRequest) {
 		g.sendToAllPlayers(gameWonResponse{Player: *g.winPlaces[0]})
 		utils.LogInfo("processTurnPlayRequest: %s has won the game", g.winPlaces[0].Name)
 	}
+}
+
+func (g *Game) processChangeNameRequest(connID string, req changeNameRequest) {
+	thePlayer := g.connections[connID].Player
+
+	name := cleanPlayerName(req.PlayerName, g.players, maxNameLength)
+	if name == "" {
+		g.sendOnConnection(connID, errorResponse{Kind: errKindInvalidName})
+		return
+	}
+
+	utils.LogInfo("processChangeNameRequest: %s is now known as %s", thePlayer.Name, name)
+	oldPlayer := *thePlayer
+	thePlayer.Name = name
+	g.sendToAllPlayers(nameChangedResponse{OldPlayer: oldPlayer, NewPlayer: *thePlayer})
+	g.sendStateToAllPlayers()
 }
 
 // returns the number of disconnected players (who we've kept places for)
