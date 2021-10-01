@@ -76,7 +76,7 @@ type gameStateRefreshResponse struct {
 	Opponents  []player  `json:"opponents"`
 	Self       player    `json:"self"`
 	SelfHand   []card    `json:"selfHand"`
-	GameState  gameState `json:"gameState"`
+	GameState  GameState `json:"gameState"`
 	LastPlayed []card    `json:"lastPlayed"`
 	FirstRound bool      `json:"firstRound"`
 	NewRound   bool      `json:"newRound"`

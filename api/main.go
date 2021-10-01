@@ -21,9 +21,11 @@ func main() {
 	flag.Parse()
 	log.SetFlags(0)
 
-	theGame := game.NewGame()
+	engineState := game.NewGameEngineState()
+	engine := game.NewGameEngine()
+
 	http.Handle("/", http.FileServer(http.Dir(*uiFolder)))
-	http.HandleFunc("/api", game.ConnectionHandler(theGame))
+	http.HandleFunc("/api", game.ConnectionHandler(engine, engineState, engine))
 
 	utils.LogInfo("Server listening on %s ...", *addr)
 	log.Fatal(http.ListenAndServe(*addr, nil))

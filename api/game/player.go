@@ -93,7 +93,7 @@ func (p players) CurrentTurn() *player {
 			return player
 		}
 	}
-	return nil // unreachable!
+	return nil
 }
 
 // AtPosition returns the player at the specified position

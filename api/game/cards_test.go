@@ -189,3 +189,89 @@ func TestSuitRankSort(t *testing.T) {
 	assert.Equal(t, 4, sorted[3].SuitRank)
 	assert.Equal(t, 1, sorted[4].SuitRank)
 }
+
+func TestBeatenByChop(t *testing.T) {
+	// nonsense
+	hand1 := []card{
+		{Suit: suitSpades, FaceValue: 3, SuitRank: 13, GlobalRank: 52},
+		{Suit: suitSpades, FaceValue: 4, SuitRank: 12, GlobalRank: 48},
+		{Suit: suitSpades, FaceValue: 5, SuitRank: 11, GlobalRank: 44},
+		{Suit: suitSpades, FaceValue: 6, SuitRank: 10, GlobalRank: 40},
+	}
+	hand2 := []card{
+		{Suit: suitDiamonds, FaceValue: 8, SuitRank: 8, GlobalRank: 30},
+		{Suit: suitHearts, FaceValue: 8, SuitRank: 8, GlobalRank: 29},
+	}
+	assert.Equal(t, false, beatenByChop(hand1, hand2))
+	assert.Equal(t, false, beatenByChop(hand2, hand1))
+
+	// quad and single 2
+	hand1 = []card{
+		{Suit: suitSpades, FaceValue: 3, SuitRank: 13, GlobalRank: 52},
+		{Suit: suitClubs, FaceValue: 3, SuitRank: 13, GlobalRank: 39},
+		{Suit: suitDiamonds, FaceValue: 3, SuitRank: 13, GlobalRank: 26},
+		{Suit: suitHearts, FaceValue: 3, SuitRank: 13, GlobalRank: 13},
+	}
+	hand2 = []card{
+		{Suit: suitHearts, FaceValue: 2, SuitRank: 1, GlobalRank: 1},
+	}
+	assert.Equal(t, true, beatenByChop(hand1, hand2))
+	assert.Equal(t, false, beatenByChop(hand2, hand1))
+
+	// quad and double 2
+	hand1 = []card{
+		{Suit: suitSpades, FaceValue: 3, SuitRank: 13, GlobalRank: 52},
+		{Suit: suitSpades, FaceValue: 4, SuitRank: 12, GlobalRank: 48},
+		{Suit: suitSpades, FaceValue: 5, SuitRank: 11, GlobalRank: 44},
+		{Suit: suitSpades, FaceValue: 6, SuitRank: 10, GlobalRank: 40},
+	}
+	hand2 = []card{
+		{Suit: suitDiamonds, FaceValue: 2, SuitRank: 1, GlobalRank: 14},
+		{Suit: suitHearts, FaceValue: 2, SuitRank: 1, GlobalRank: 1},
+	}
+	assert.Equal(t, false, beatenByChop(hand1, hand2))
+	assert.Equal(t, false, beatenByChop(hand2, hand1))
+
+	// doubles seq and single 2
+	hand1 = []card{
+		{Suit: suitSpades, FaceValue: 3, SuitRank: 13, GlobalRank: 52},
+		{Suit: suitClubs, FaceValue: 3, SuitRank: 13, GlobalRank: 51},
+		{Suit: suitDiamonds, FaceValue: 4, SuitRank: 12, GlobalRank: 46},
+		{Suit: suitHearts, FaceValue: 4, SuitRank: 12, GlobalRank: 45},
+		{Suit: suitSpades, FaceValue: 5, SuitRank: 11, GlobalRank: 44},
+		{Suit: suitClubs, FaceValue: 5, SuitRank: 11, GlobalRank: 43},
+	}
+	hand2 = []card{
+		{Suit: suitHearts, FaceValue: 2, SuitRank: 1, GlobalRank: 1},
+	}
+	assert.Equal(t, true, beatenByChop(hand1, hand2))
+	assert.Equal(t, false, beatenByChop(hand2, hand1))
+
+	// doubles seq and double 2
+	hand1 = []card{
+		{Suit: suitSpades, FaceValue: 3, SuitRank: 13, GlobalRank: 52},
+		{Suit: suitClubs, FaceValue: 3, SuitRank: 13, GlobalRank: 51},
+		{Suit: suitDiamonds, FaceValue: 4, SuitRank: 12, GlobalRank: 46},
+		{Suit: suitHearts, FaceValue: 4, SuitRank: 12, GlobalRank: 45},
+		{Suit: suitSpades, FaceValue: 5, SuitRank: 11, GlobalRank: 44},
+		{Suit: suitClubs, FaceValue: 5, SuitRank: 11, GlobalRank: 43},
+		{Suit: suitSpades, FaceValue: 6, SuitRank: 10, GlobalRank: 42},
+		{Suit: suitClubs, FaceValue: 6, SuitRank: 10, GlobalRank: 41},
+	}
+	hand2 = []card{
+		{Suit: suitDiamonds, FaceValue: 2, SuitRank: 1, GlobalRank: 14},
+		{Suit: suitHearts, FaceValue: 2, SuitRank: 1, GlobalRank: 1},
+	}
+	assert.Equal(t, true, beatenByChop(hand1, hand2))
+	assert.Equal(t, false, beatenByChop(hand2, hand1))
+}
+
+func TestCardInSet(t *testing.T) {
+	cards := []card{
+		{GlobalRank: 52},
+		{GlobalRank: 24},
+	}
+	assert.Equal(t, 0, cardInSet(52, cards))
+	assert.Equal(t, 1, cardInSet(24, cards))
+	assert.Equal(t, -1, cardInSet(51, cards))
+}

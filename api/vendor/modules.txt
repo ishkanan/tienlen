@@ -16,6 +16,8 @@ github.com/pmezard/go-difflib/difflib
 # github.com/stretchr/testify v1.6.1
 ## explicit
 github.com/stretchr/testify/assert
+# golang.org/x/tools v0.1.9
+## explicit
 # gopkg.in/yaml.v3 v3.0.0-20200605160147-a5ece683394c
 ## explicit
 gopkg.in/yaml.v3

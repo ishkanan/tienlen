@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"reflect"
+	"sync"
 	"time"
 
 	"github.com/google/uuid"
@@ -19,14 +20,21 @@ var upgrader = websocket.Upgrader{
 	Subprotocols: []string{"json"},
 }
 
-// IMessageSource defines how the ingress socket events are pumped to the game
-type IMessageSource interface {
-	IsAcceptingConnections() bool
-	ConnectionStateChanged(uuid.UUID, IMessageSink, connState)
-	ProcessRequest(uuid.UUID, interface{}, reflect.Type)
+// ISender defines how the game pumps events to the underlying sockets
+type ISender interface {
+	SendResponseToAllPlayers(state GameEngineState, response interface{}) map[*PlayerContext]error
+	SendResponseOnConnection(state GameEngineState, connID string, response interface{}) error
+	SendStateToAllPlayers(state GameEngineState) map[*PlayerContext]error
 }
 
-// IMessageSink defines how the game interfaces with the underlying sockets
+// IMessageSource defines how the ingress socket events are pumped to the game
+type IMessageSource interface {
+	IsAcceptingConnections(GameEngineState) bool
+	ConnectionStateChanged(GameEngineState, uuid.UUID, IMessageSink, connState, ISender) GameEngineState
+	ProcessRequest(GameEngineState, uuid.UUID, interface{}, reflect.Type, ISender) GameEngineState
+}
+
+// IMessageSink defines how the game interfaces with a single underlying socket
 type IMessageSink interface {
 	Send(interface{}) error
 	Close() error
@@ -39,7 +47,7 @@ type MessageSink struct {
 }
 
 // Send attempts to send a response-type message through the underlying connection
-func (m MessageSink) Send(response interface{}) error {
+func (m *MessageSink) Send(response interface{}) error {
 	responseType := reflect.TypeOf(response)
 	for t, ident := range responseMap() {
 		if t == responseType {
@@ -58,7 +66,7 @@ func (m MessageSink) Send(response interface{}) error {
 }
 
 // Close closes the underlying connection
-func (m MessageSink) Close() error {
+func (m *MessageSink) Close() error {
 	return m.Connection.Close()
 }
 
@@ -115,7 +123,28 @@ func responseMap() map[reflect.Type]string {
 }
 
 // ConnectionHandler provides incoming message and ping "pump" logic for a given connection
-func ConnectionHandler(game IMessageSource) func(w http.ResponseWriter, r *http.Request) {
+func ConnectionHandler(game IMessageSource, initState GameEngineState, pump ISender) func(w http.ResponseWriter, r *http.Request) {
+	state := initState
+	mutex := &sync.Mutex{}
+
+	isAcceptingConnections := func() bool {
+		mutex.Lock()
+		defer mutex.Unlock()
+		return game.IsAcceptingConnections(state)
+	}
+
+	connectionStateChanged := func(connID uuid.UUID, sink IMessageSink, connState connState) GameEngineState {
+		mutex.Lock()
+		defer mutex.Unlock()
+		return game.ConnectionStateChanged(state, connID, sink, connState, pump)
+	}
+
+	processRequest := func(connID uuid.UUID, request interface{}, requestType reflect.Type) GameEngineState {
+		mutex.Lock()
+		defer mutex.Unlock()
+		return game.ProcessRequest(state, connID, request, requestType, pump)
+	}
+
 	return func(w http.ResponseWriter, r *http.Request) {
 		utils.LogDebug("ConnectionHandler:: New HTTP connection from %s", r.RemoteAddr)
 
@@ -128,15 +157,15 @@ func ConnectionHandler(game IMessageSource) func(w http.ResponseWriter, r *http.
 
 		connID := uuid.New()
 		utils.LogDebug("ConnectionHandler:: %s is assigned connID %s", r.RemoteAddr, connID.String())
-		sink := MessageSink{ConnID: connID, Connection: conn}
+		sink := &MessageSink{ConnID: connID, Connection: conn}
 
-		if !game.IsAcceptingConnections() {
+		if !isAcceptingConnections() {
 			_ = sink.Send(errorResponse{Kind: errKindGameFull})
 			utils.LogDebug("ConnectionHandler:: %s tried to join, but game is full", connID.String())
 			return
 		}
 
-		game.ConnectionStateChanged(connID, sink, connStateNew)
+		state = connectionStateChanged(connID, sink, connStateNew)
 
 		var lastPingError error
 		conn.SetPongHandler(func(appData string) error {
@@ -150,19 +179,19 @@ func ConnectionHandler(game IMessageSource) func(w http.ResponseWriter, r *http.
 			}
 			return lastPingError
 		})
+
 		err = conn.WriteControl(websocket.PingMessage, nil, time.Now().Add(5*time.Second))
 		if err != nil {
 			utils.LogDebug("ConnectionHandler:: initial ping write error for %s - %v", connID.String(), err)
-			game.ConnectionStateChanged(connID, sink, connStateDead)
+			state = connectionStateChanged(connID, sink, connStateDead)
 			return
 		}
 
 		var message Message
 		for {
-			err = conn.ReadJSON(&message)
-			if err != nil {
+			if conn.ReadJSON(&message); err != nil {
 				utils.LogDebug("ConnectionHandler:: read error for %s - %v", connID.String(), err)
-				game.ConnectionStateChanged(connID, sink, connStateDead)
+				state = connectionStateChanged(connID, sink, connStateDead)
 				return
 			}
 
@@ -178,7 +207,7 @@ func ConnectionHandler(game IMessageSource) func(w http.ResponseWriter, r *http.
 				continue
 			}
 
-			game.ProcessRequest(connID, request, reflect.TypeOf(request))
+			state = processRequest(connID, request, reflect.TypeOf(request))
 		}
 	}
 }
