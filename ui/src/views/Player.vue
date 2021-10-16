@@ -181,14 +181,13 @@ export default defineComponent({
 .viewport {
   width: 100%;
   max-height: 100%;
-  margin: 20px 0 0 0;
+  margin: 15px 0 0 0;
 }
 
 .controls {
   width: 100%;
   color: white;
-  height: 45px;
-  margin-top: 20px;
+  height: 40px;
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -204,7 +203,7 @@ export default defineComponent({
 
 .hand {
   width: 100%;
-  margin-top: 20px;
+  margin-top: 15px;
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -215,7 +214,7 @@ export default defineComponent({
     background: url(../assets/images/trophy.png);
     background-size: cover;
     background-repeat: no-repeat;
-    margin-top: 40px;
+    margin-top: 30px;
     text-align: center;
 
     & .note {
@@ -229,7 +228,7 @@ export default defineComponent({
   }
 
   & .unfaced {
-    margin-top: 40px;
+    margin-top: 30px;
   }
 }
 

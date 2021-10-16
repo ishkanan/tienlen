@@ -79,7 +79,7 @@ export default defineComponent({
 }
 
 .card {
-  margin-top: 40px;
+  margin-top: 30px;
 }
 
 .raised {

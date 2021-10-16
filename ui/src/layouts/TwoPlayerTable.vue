@@ -23,47 +23,19 @@ export default defineComponent({});
   height: 100%;
   width: 100%;
   display: grid;
-  grid-template-columns: repeat(10, 10%);
-  grid-template-rows: repeat(6, 16.67%);
+  grid-template-columns: repeat(40, 2.5%);
+  grid-template-rows: repeat(17, 5.88%);
 }
 
 .player {
-  grid-area: 5 / 2 / 7 / 10;
-}
-
-.opponent1 {
-  grid-area: 1 / 5 / 3 / 7;
+  grid-area: 12 / 5 / 18 / 37;
 }
 
 .discard {
-  grid-area: 3 / 3 / 5 / 9;
+  grid-area: 7 / 9 / 12 / 33;
 }
 
-.controls {
-  grid-area: 1 / 1 / 2 / 2;
-}
-
-@media (max-width: 1100px) {
-  .viewport {
-    grid-template-columns: repeat(10, 10%);
-    grid-template-rows: repeat(20, 5%);
-  }
-
-  .player {
-    grid-area: 8 / 1 / 12 / 11;
-  }
-
-  .opponent1 {
-    grid-area: 2 / 3 / 3 / 9;
-    margin-top: 10px;
-  }
-
-  .discard {
-    grid-area: 3 / 1 / 7 / 11;
-  }
-
-  .controls {
-    grid-area: 1 / 1 / 2 / 3;
-  }
+.opponent1 {
+  grid-area: 1 / 16 / 6 / 26;
 }
 </style>
