@@ -32,6 +32,7 @@ export default defineComponent({
       [EventSeverity.Info]: 'info',
       [EventSeverity.Error]: 'error',
       [EventSeverity.Warning]: 'success',
+      [EventSeverity.Success]: 'info',
     };
 
     watch(

@@ -5,7 +5,8 @@
       <button v-if="canPlay" :disabled="!cardsSelected" @click="doPlay">Play cards</button>
       <button v-if="canPass" class="danger" @click="doPass">Pass turn</button>
       <h2 v-if="autoPassing">Your turn will be automatically passed...</h2>
-      <h2 v-if="waiting">Waiting for turn...</h2>
+      <h2 v-if="passed">You have passed! Sit tight.</h2>
+      <h2 v-else-if="waiting">Waiting for turn...</h2>
       <h2 v-if="winPlace > 0 && !canStart">All done bucko! Have a break.</h2>
     </div>
 
@@ -26,7 +27,6 @@
     </div>
 
     <div :class="$style.nameBar">
-      <BlockIcon v-if="passed" :class="$style.block" />
       <h3 :class="{ [$style.isTurn]: player.isTurn }">{{ player.name }}</h3>
     </div>
   </div>
@@ -34,7 +34,6 @@
 
 <script lang="ts">
 import { defineComponent, computed, ref, watch } from '@vue/composition-api';
-import BlockIcon from '~/components/BlockIcon.vue';
 import CardView from '~/components/Card.vue';
 import Hand from '~/components/Hand.vue';
 import { Card, Suit, EventSeverity } from '~/lib/models';
@@ -43,7 +42,7 @@ import { requestStartGame, requestTurnPass, requestTurnPlay } from '~/lib/socket
 import { game } from '~/store/game';
 
 export default defineComponent({
-  components: { BlockIcon, CardView, Hand },
+  components: { CardView, Hand },
 
   setup() {
     const autoPassed = ref(false);
@@ -182,14 +181,13 @@ export default defineComponent({
 .viewport {
   width: 100%;
   max-height: 100%;
-  margin: 20px 0 0 0;
+  margin: 15px 0 0 0;
 }
 
 .controls {
   width: 100%;
   color: white;
-  height: 45px;
-  margin-top: 20px;
+  height: 40px;
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -205,7 +203,7 @@ export default defineComponent({
 
 .hand {
   width: 100%;
-  margin-top: 20px;
+  margin-top: 15px;
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -216,7 +214,7 @@ export default defineComponent({
     background: url(../assets/images/trophy.png);
     background-size: cover;
     background-repeat: no-repeat;
-    margin-top: 40px;
+    margin-top: 30px;
     text-align: center;
 
     & .note {
@@ -230,7 +228,7 @@ export default defineComponent({
   }
 
   & .unfaced {
-    margin-top: 40px;
+    margin-top: 30px;
   }
 }
 
@@ -241,14 +239,6 @@ export default defineComponent({
   justify-content: center;
   color: #f2f2f2;
 
-  & .block {
-    width: 24px;
-    height: 24px;
-    fill: red;
-    background-color: black;
-    border-radius: 12px;
-  }
-
   & h3 {
     margin: 10px 0 10px 0;
     padding: 2px 6px 2px 6px;
@@ -258,8 +248,8 @@ export default defineComponent({
     background-color: #f2f2f2;
     border-radius: 5px;
     color: black;
-    padding: 2px 6px 2px 6px;
-    border: 3px solid blue;
+    border: 1px solid black;
+    padding: 1px 5px 1px 5px;
   }
 }
 </style>

@@ -1,5 +1,5 @@
 <template>
-  <div :class="$style.viewport">
+  <div>
     <div :class="$style.gameTable">
       <slot name="gameTable" />
     </div>
@@ -24,16 +24,10 @@ export default defineComponent({});
 </script>
 
 <style lang="postcss" module>
-.viewport {
-  height: 100%;
-  width: 100%;
-}
-
 .gameTable {
-  height: 860px;
-  width: 1600px;
-  margin: 25px auto 0 auto;
-  padding: 20px;
+  height: 750px;
+  width: 1500px;
+  padding: 10px;
   background-color: rgba(48, 112, 16, 0.7);
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
   border: 4mm ridge rgba(170, 50, 50, 0.6);
@@ -41,7 +35,7 @@ export default defineComponent({});
 }
 
 .headsUp {
-  width: 1600px;
+  width: 1540px;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -63,7 +57,7 @@ export default defineComponent({});
 
   & .activityArea {
     width: 800px;
-    height: 250px;
+    height: 200px;
     background-color: rgba(50, 50, 50, 0.8);
     border: 3px black double;
   }

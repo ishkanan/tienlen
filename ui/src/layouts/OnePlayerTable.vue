@@ -20,38 +20,15 @@ export default defineComponent({});
   height: 100%;
   width: 100%;
   display: grid;
-  grid-template-columns: repeat(10, 10%);
-  grid-template-rows: repeat(6, 16.67%);
+  grid-template-columns: repeat(40, 2.5%);
+  grid-template-rows: repeat(17, 5.88%);
 }
 
 .player {
-  grid-area: 5 / 2 / 7 / 10;
+  grid-area: 12 / 5 / 18 / 37;
 }
 
 .discard {
-  grid-area: 3 / 3 / 5 / 9;
-}
-
-.controls {
-  grid-area: 1 / 1 / 2 / 2;
-}
-
-@media (max-width: 1100px) {
-  .viewport {
-    grid-template-columns: repeat(10, 10%);
-    grid-template-rows: repeat(20, 5%);
-  }
-
-  .player {
-    grid-area: 7 / 1 / 11 / 11;
-  }
-
-  .discard {
-    grid-area: 2 / 1 / 6 / 11;
-  }
-
-  .controls {
-    grid-area: 1 / 1 / 2 / 3;
-  }
+  grid-area: 7 / 9 / 12 / 33;
 }
 </style>

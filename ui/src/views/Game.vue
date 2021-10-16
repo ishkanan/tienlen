@@ -26,13 +26,17 @@
         <template #discard><DiscardView /></template>
         <template #player><PlayerView /></template>
         <template #opponent1>
-          <OpponentView :position="opponents[0].position" />
+          <div :class="$style.nudge">
+            <OpponentView :position="opponents[0].position" />
+          </div>
         </template>
         <template #opponent2>
           <OpponentView :position="opponents[1].position" />
         </template>
         <template #opponent3>
-          <OpponentView :position="opponents[2].position" />
+          <div :class="$style.nudge">
+            <OpponentView :position="opponents[2].position" />
+          </div>
         </template>
       </FourPlayerLayout>
     </template>
@@ -123,4 +127,8 @@ export default defineComponent({
 });
 </script>
 
-<style lang="postcss" module></style>
+<style lang="postcss" module>
+.nudge {
+  margin-top: 6%;
+}
+</style>
