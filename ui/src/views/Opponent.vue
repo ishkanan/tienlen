@@ -2,7 +2,6 @@
   <div v-if="opponent" :class="$style.viewport">
     <div :class="$style.player">
       <span :class="$style.nameBar">
-        <BlockIcon v-if="passed" :class="$style.block" />
         <h3 :class="{ [$style.isTurn]: opponent.isTurn }">{{ opponent.name }}</h3>
       </span>
 
@@ -12,31 +11,24 @@
         <h2 :class="$style.note">{{ ordinalisedWinPlace }}</h2>
       </div>
 
-      <CardView
-        v-else
-        :class="$style.notMobile"
-        :card="unfaced"
-        :selectable="false"
-        :show-face="false"
-      >
-        <template #info>
-          <h1 v-if="opponent.cardsLeft > 0" :class="$style.note">x {{ opponent.cardsLeft }}</h1>
-        </template>
-      </CardView>
+      <template v-else>
+        <CardView :class="$style.card" :card="unfaced" :selectable="false" :show-face="false" />
+        <h1 v-if="opponent.cardsLeft > 0" :class="$style.cardsLeft">x {{ opponent.cardsLeft }}</h1>
+        <div v-if="passed" :class="$style.passed" />
+      </template>
     </div>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, computed, watch } from '@vue/composition-api';
-import BlockIcon from '~/components/BlockIcon.vue';
 import CardView from '~/components/Card.vue';
 import { Suit } from '~/lib/models';
 import { ordinalise, setTitle } from '~/lib/utils';
 import { game } from '~/store/game';
 
 export default defineComponent({
-  components: { BlockIcon, CardView },
+  components: { CardView },
 
   props: {
     position: {
@@ -106,8 +98,28 @@ export default defineComponent({
   align-items: center;
   justify-content: center;
 
-  & .notMobile {
+  & .card {
     display: block;
+    z-index: 0;
+  }
+
+  & .cardsLeft {
+    top: -103px;
+    width: 80px;
+    color: #f2f2f2;
+    text-align: center;
+    position: relative;
+    z-index: 2;
+  }
+
+  & .passed {
+    top: -201px;
+    height: 120px;
+    width: 120px;
+    background: url(../assets/images/passed.png);
+    opacity: 0.7;
+    position: relative;
+    z-index: 1;
   }
 
   & .nameBar {
@@ -116,19 +128,12 @@ export default defineComponent({
     align-items: center;
     justify-content: center;
 
-    & .block {
-      width: 24px;
-      height: 24px;
-      fill: red;
-      background-color: black;
-      border-radius: 12px;
-    }
-
     & .isTurn {
       background-color: #f2f2f2;
       border-radius: 5px;
       color: black;
-      border: 3px solid blue;
+      border: 1px solid black;
+      padding: 1px 5px 1px 5px;
     }
   }
 
@@ -136,12 +141,6 @@ export default defineComponent({
     color: #f2f2f2;
     margin: 10px 0 10px 0;
     padding: 2px 6px 2px 6px;
-  }
-
-  & .note {
-    color: #f2f2f2;
-    padding-top: 17px;
-    text-align: center;
   }
 
   & .disconnected {
@@ -166,6 +165,7 @@ export default defineComponent({
       padding: 0px;
       width: 60%;
       margin: 40px auto auto auto;
+      text-align: center;
     }
   }
 }

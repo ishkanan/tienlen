@@ -49,10 +49,3 @@ button:disabled {
   background-color: rgba(200, 200, 200);
   color: white;
 }
-
-@media (max-width: 1100px) {
-  button {
-    padding: 0 15px;
-    font-size: 0.9rem;
-  }
-}

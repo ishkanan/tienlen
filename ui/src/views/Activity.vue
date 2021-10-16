@@ -3,7 +3,12 @@
     <div
       v-for="(event, i) in events"
       :key="i"
-      :class="[$style.event, event.isError && $style.error, event.isWarning && $style.warning]"
+      :class="[
+        $style.event,
+        event.isError && $style.error,
+        event.isWarning && $style.warning,
+        event.isSuccess && $style.success,
+      ]"
     >
       <template v-for="(rune, j) in event.runes">
         <p v-if="j === 0" :key="j" :class="[$style.rune, $style.runeTime]">
@@ -30,6 +35,7 @@ import { game } from '~/store/game';
 
 interface event {
   timestamp: string;
+  isSuccess: boolean;
   isError: boolean;
   isWarning: boolean;
   runes: rune[];
@@ -56,6 +62,7 @@ export default defineComponent({
         .filter((e) => !e.toast)
         .map<event>((e) => ({
           timestamp: format(e.timestamp, 'kk:mm:ss'),
+          isSuccess: e.severity === EventSeverity.Success,
           isError: e.severity === EventSeverity.Error,
           isWarning: e.severity === EventSeverity.Warning,
           runes: e.runes.map((r) => ({
@@ -123,6 +130,10 @@ p {
 }
 
 .error {
-  color: rgba(220, 0, 0) !important;
+  color: rgba(220, 0, 0.8) !important;
+}
+
+.success {
+  color: rgba(0, 220, 0.8) !important;
 }
 </style>

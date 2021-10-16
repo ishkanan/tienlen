@@ -97,11 +97,16 @@ class Game extends VuexModule {
     return this.gameState === GameState.Paused;
   }
 
+  get isFirstGame(): boolean {
+    const scores = this.opponents.reduce((memo, p) => memo + p.score, this.self?.score ?? 0);
+    return scores === 0;
+  }
+
   @Action
   playerJoined({ response }: { response: PlayerJoinedResponse }) {
     this.pushEvent({
       severity: EventSeverity.Info,
-      runes: [{ message: `${response.player.name} has joined the game.` }],
+      runes: [{ message: `"${response.player.name}" has joined the game.` }],
     });
     this.connState = ConnectionState.Connected;
   }
@@ -128,15 +133,16 @@ class Game extends VuexModule {
   playerDisconnected({ response }: { response: PlayerDisconnectedResponse }) {
     this.pushEvent({
       severity: this.isInLobby ? EventSeverity.Info : EventSeverity.Error,
-      runes: [{ message: `${response.player.name} has left the game.` }],
+      runes: [{ message: `"${response.player.name}" has left the game.` }],
     });
   }
 
   @Action
   gameStarted({ response }: { response: GameStartedResponse }) {
+    if (!this.isFirstGame) this.events = [];
     this.pushEvent({
       severity: EventSeverity.Info,
-      runes: [{ message: `${response.player.name} has started the game.` }],
+      runes: [{ message: `"${response.player.name}" has started the game.` }],
     });
   }
 
@@ -160,17 +166,17 @@ class Game extends VuexModule {
   turnPassed({ response }: { response: TurnPassedResponse }) {
     this.pushEvent({
       severity: EventSeverity.Info,
-      runes: [{ message: `${response.player.name} has passed their turn.` }],
+      runes: [{ message: `"${response.player.name}" has passed their turn.` }],
     });
   }
 
   @Action
   playerPlaced({ response }: { response: PlayerPlacedResponse }) {
     this.pushEvent({
-      severity: EventSeverity.Info,
+      severity: EventSeverity.Success,
       runes: [
         {
-          message: `${response.player.name} has no more cards and placed ${ordinalise(
+          message: `"${response.player.name}" has no more cards and placed ${ordinalise(
             response.place,
           )}.`,
         },
@@ -181,8 +187,8 @@ class Game extends VuexModule {
   @Action
   roundWon({ response }: { response: RoundWonResponse }) {
     this.pushEvent({
-      severity: EventSeverity.Info,
-      runes: [{ message: `${response.player.name} has won the round.` }],
+      severity: EventSeverity.Success,
+      runes: [{ message: `"${response.player.name}" has won the round.` }],
     });
   }
 
@@ -193,7 +199,7 @@ class Game extends VuexModule {
       severity: EventSeverity.Info,
       runes: [
         {
-          message: `${response.player.name} played `,
+          message: `"${response.player.name}" played `,
         },
         ...cards,
       ],
@@ -204,15 +210,17 @@ class Game extends VuexModule {
   nameChanged({ response }: { response: NameChangedResponse }) {
     this.pushEvent({
       severity: EventSeverity.Info,
-      runes: [{ message: `${response.oldPlayer.name} is now known as ${response.newPlayer.name}` }],
+      runes: [
+        { message: `"${response.oldPlayer.name}" is now known as "${response.newPlayer.name}"` },
+      ],
     });
   }
 
   @Action
   gameWon({ response }: { response: GameWonResponse }) {
     this.pushEvent({
-      severity: EventSeverity.Info,
-      runes: [{ message: `${response.player.name} has won the game.` }],
+      severity: EventSeverity.Success,
+      runes: [{ message: `"${response.player.name}" has won the game.` }],
     });
   }
 
@@ -220,7 +228,7 @@ class Game extends VuexModule {
   gameReset({ response }: { response: GameResetResponse }) {
     this.pushEvent({
       severity: EventSeverity.Warning,
-      runes: [{ message: `${response.player.name} has reset the game. Dick move?` }],
+      runes: [{ message: `"${response.player.name}" has reset the game. Dick move?` }],
     });
   }
 
