@@ -12,7 +12,7 @@
     </template>
     <template v-else>
       <div :class="$style.messageAndLastPlayed">
-        <h2 v-if="inLobby && previousWinner" :class="$style.message">
+        <h2 v-if="inLobby && previousWinner">
           The game has finished! One more?
         </h2>
         <h2 v-else-if="lastPlayedCards.length > 0 && !!lastPlayed">
