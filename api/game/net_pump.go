@@ -15,6 +15,11 @@ import (
 	"github.com/ishkanan/tienlen/api/utils"
 )
 
+// timings allow for 5 seconds between PING and PONG
+const disconnectThreshold = 10 * time.Second
+const pingWriteDelay = 3 * time.Second
+const pingWriteFailThreshold = 2 * time.Second
+
 var upgrader = websocket.Upgrader{
 	CheckOrigin:  func(r *http.Request) bool { return true },
 	Subprotocols: []string{"json"},
@@ -122,7 +127,7 @@ func responseMap() map[reflect.Type]string {
 	}
 }
 
-// ConnectionHandler provides incoming message and ping "pump" logic for a given connection
+// ConnectionHandler provides incoming message and ping check logic for a given connection
 func ConnectionHandler(game IMessageSource, initState GameEngineState, pump ISender) func(w http.ResponseWriter, r *http.Request) {
 	state := initState
 	mutex := &sync.Mutex{}
@@ -145,7 +150,29 @@ func ConnectionHandler(game IMessageSource, initState GameEngineState, pump ISen
 		return game.ProcessRequest(state, connID, request, requestType, pump)
 	}
 
+	pongChecker := func(conn *websocket.Conn, connID uuid.UUID, lastPongReceived *time.Time, terminated *bool) {
+		for {
+			time.Sleep(1 * time.Second)
+			if *terminated {
+				utils.LogDebug("ConnectionHandler:: %s is terminated, will stop pong checker", connID.String())
+				return
+			}
+			func() {
+				mutex.Lock()
+				defer mutex.Unlock()
+				if time.Now().Sub(*lastPongReceived) > disconnectThreshold {
+					utils.LogDebug("ConnectionHandler:: %s failed a pong check, will close connection", connID.String())
+					*terminated = true
+					conn.Close()
+				}
+			}()
+		}
+	}
+
 	return func(w http.ResponseWriter, r *http.Request) {
+		lastPongReceived := time.Now()
+		terminated := false
+
 		utils.LogDebug("ConnectionHandler:: New HTTP connection from %s", r.RemoteAddr)
 
 		conn, err := upgrader.Upgrade(w, r, nil)
@@ -167,30 +194,35 @@ func ConnectionHandler(game IMessageSource, initState GameEngineState, pump ISen
 
 		state = connectionStateChanged(connID, sink, connStateNew)
 
-		var lastPingError error
 		conn.SetPongHandler(func(appData string) error {
+			lastPongReceived = time.Now()
 			go func() {
-				// sends one final ping after connection death, which is fine
-				time.Sleep(5 * time.Second)
-				lastPingError = conn.WriteControl(websocket.PingMessage, nil, time.Now().Add(5*time.Second))
+				time.Sleep(pingWriteDelay)
+				if terminated {
+					utils.LogDebug("ConnectionHandler:: %s is terminated, skipping ping send", connID.String())
+					return
+				}
+				if err = conn.WriteControl(websocket.PingMessage, nil, time.Now().Add(pingWriteFailThreshold)); err != nil {
+					utils.LogDebug("ConnectionHandler:: %s failed a ping write, will close connection", connID.String())
+					terminated = true
+					conn.Close()
+				}
 			}()
-			if lastPingError != nil {
-				utils.LogDebug("ConnectionHandler:: ping write error for %s - %v", connID.String(), err)
-			}
-			return lastPingError
+			return nil
 		})
-
-		err = conn.WriteControl(websocket.PingMessage, nil, time.Now().Add(5*time.Second))
-		if err != nil {
+		if err = conn.WriteControl(websocket.PingMessage, nil, time.Now().Add(pingWriteFailThreshold)); err != nil {
 			utils.LogDebug("ConnectionHandler:: initial ping write error for %s - %v", connID.String(), err)
+			terminated = true
 			state = connectionStateChanged(connID, sink, connStateDead)
 			return
 		}
+		go pongChecker(conn, connID, &lastPongReceived, &terminated)
 
 		var message Message
 		for {
-			if conn.ReadJSON(&message); err != nil {
+			if err = conn.ReadJSON(&message); err != nil {
 				utils.LogDebug("ConnectionHandler:: read error for %s - %v", connID.String(), err)
+				terminated = true
 				state = connectionStateChanged(connID, sink, connStateDead)
 				return
 			}
