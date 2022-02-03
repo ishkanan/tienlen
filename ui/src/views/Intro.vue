@@ -13,10 +13,11 @@ import { defineComponent, computed, ref } from '@vue/composition-api';
 import { joinGame } from '~/lib/socket';
 import { setTitle } from '~/lib/utils';
 import { game, ConnectionState } from '~/store/game';
+import { getLastName, saveLastName } from '~/lib/runtime';
 
 export default defineComponent({
   setup() {
-    const name = ref('');
+    const name = ref(getLastName());
     const nameLatin1Check = /[\u0020-\u007e\u00C0-\u00ff]+/g;
     const validName = computed(() => {
       const matches = name.value.match(nameLatin1Check);
@@ -27,6 +28,7 @@ export default defineComponent({
 
     const handleConnect = () => {
       game.name = name.value;
+      saveLastName(name.value);
       joinGame({ name: name.value });
     };
 
