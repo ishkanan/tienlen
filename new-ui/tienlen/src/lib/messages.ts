@@ -1,26 +1,26 @@
-import { Card, Player } from './models';
+import { type Card, type Player } from './models'
 
 export interface Message {
-  kind: string;
-  data: string;
+  kind: string
+  data: string
 }
 
 export interface JoinGameRequest {
-  playerName: string;
+  playerName: string
 }
 
 export interface PlayerJoinedResponse {
-  player: Player;
+  player: Player
 }
 
 export interface PlayerDisconnectedResponse {
-  player: Player;
+  player: Player
 }
 
 export interface StartGameRequest {}
 
 export interface GameStartedResponse {
-  player: Player;
+  player: Player
 }
 
 export interface GamePausedResponse {}
@@ -30,44 +30,44 @@ export interface GameResumedResponse {}
 export interface TurnPassRequest {}
 
 export interface TurnPassedResponse {
-  player: Player;
+  player: Player
 }
 
 export interface RoundWonResponse {
-  player: Player;
+  player: Player
 }
 
 export interface TurnPlayRequest {
-  cards: number[];
+  cards: number[]
 }
 
 export interface TurnPlayedResponse {
-  player: Player;
-  cards: Card[];
+  player: Player
+  cards: Card[]
 }
 
 export interface PlayerPlacedResponse {
-  player: Player;
-  place: number;
+  player: Player
+  place: number
 }
 
 export interface GameWonResponse {
-  player: Player;
+  player: Player
 }
 
 export interface ResetGameRequest {}
 
 export interface GameResetResponse {
-  player: Player;
+  player: Player
 }
 
 export interface ChangeNameRequest {
-  name: string;
+  name: string
 }
 
 export interface NameChangedResponse {
-  oldPlayer: Player;
-  newPlayer: Player;
+  oldPlayer: Player
+  newPlayer: Player
 }
 
 export enum GameState {
@@ -77,14 +77,14 @@ export enum GameState {
 }
 
 export interface GameStateRefreshResponse {
-  opponents: Player[];
-  self: Player;
-  selfHand: Card[];
-  gameState: GameState;
-  lastPlayed: Card[];
-  firstRound: boolean;
-  newRound: boolean;
-  winPlaces: Player[];
+  opponents: Player[]
+  self: Player
+  selfHand: Card[]
+  gameState: GameState
+  lastPlayed: Card[]
+  firstRound: boolean
+  newRound: boolean
+  winPlaces: Player[]
 }
 
 export enum ErrorKind {
@@ -101,5 +101,5 @@ export enum ErrorKind {
 }
 
 export interface ErrorResponse {
-  kind: ErrorKind;
+  kind: ErrorKind
 }
