@@ -1,21 +1,18 @@
 <template>
-  <div :class="$style.viewport">
-    <div :class="$style.player">
+  <div class="viewport">
+    <div class="player">
       <slot name="player" />
     </div>
-    <div :class="$style.discard">
+    <div class="opponent1">
+      <slot name="opponent1" />
+    </div>
+    <div class="discard">
       <slot name="discard" />
     </div>
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from '@vue/composition-api';
-
-export default defineComponent({});
-</script>
-
-<style lang="postcss" module>
+<style scoped>
 .viewport {
   height: 100%;
   width: 100%;
@@ -30,5 +27,9 @@ export default defineComponent({});
 
 .discard {
   grid-area: 7 / 9 / 12 / 33;
+}
+
+.opponent1 {
+  grid-area: 1 / 16 / 6 / 26;
 }
 </style>

@@ -1,0 +1,28 @@
+<template>
+  <div class="viewport">
+    <div class="player">
+      <slot name="player" />
+    </div>
+    <div class="discard">
+      <slot name="discard" />
+    </div>
+  </div>
+</template>
+
+<style scoped>
+.viewport {
+  height: 100%;
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(40, 2.5%);
+  grid-template-rows: repeat(17, 5.88%);
+}
+
+.player {
+  grid-area: 12 / 5 / 18 / 37;
+}
+
+.discard {
+  grid-area: 7 / 9 / 12 / 33;
+}
+</style>

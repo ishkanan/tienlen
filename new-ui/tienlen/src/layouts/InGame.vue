@@ -1,29 +1,23 @@
 <template>
   <div>
-    <div :class="$style.gameTable">
+    <div class="gameTable">
       <slot name="gameTable" />
     </div>
-    <div :class="$style.headsUp">
-      <div :class="$style.scoreArea">
+    <div class="headsUp">
+      <div class="scoreArea">
         <slot name="scoreArea" />
       </div>
-      <div :class="$style.controlsArea">
+      <div class="controlsArea">
         <slot name="controlsArea" />
       </div>
-      <div :class="$style.activityArea">
+      <div class="activityArea">
         <slot name="activityArea" />
       </div>
     </div>
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from '@vue/composition-api';
-
-export default defineComponent({});
-</script>
-
-<style lang="postcss" module>
+<style scoped>
 .gameTable {
   height: 750px;
   width: 1500px;

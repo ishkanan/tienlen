@@ -1,30 +1,24 @@
 <template>
-  <div :class="$style.viewport">
-    <div :class="$style.player">
+  <div class="viewport">
+    <div class="player">
       <slot name="player" />
     </div>
-    <div :class="$style.opponent1">
+    <div class="opponent1">
       <slot name="opponent1" />
     </div>
-    <div :class="$style.opponent2">
+    <div class="opponent2">
       <slot name="opponent2" />
     </div>
-    <div :class="$style.opponent3">
+    <div class="opponent3">
       <slot name="opponent3" />
     </div>
-    <div :class="$style.discard">
+    <div class="discard">
       <slot name="discard" />
     </div>
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from '@vue/composition-api';
-
-export default defineComponent({});
-</script>
-
-<style lang="postcss" module>
+<style scoped>
 .viewport {
   height: 100%;
   width: 100%;
