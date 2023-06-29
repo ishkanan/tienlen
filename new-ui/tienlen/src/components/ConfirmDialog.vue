@@ -14,7 +14,7 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const emit = defineEmits<{
-  (e: 'confirm', value: Boolean): void
+  (e: 'confirm', value: boolean): void
 }>()
 
 const handleClickButton = (confirm: boolean) => {

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { type Card, Suit } from '../lib/models';
+import { type Card, Suit } from '../lib/models'
 
 const props = defineProps<{
   card: Card,

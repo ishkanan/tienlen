@@ -266,8 +266,14 @@ export const useGameStore = defineStore('game', () => {
   }
 
   return {
-    actionError,
     connState,
+    events,
+    isInProgress,
+    name,
+    opponents,
+    self,
+    winPlaces,
+    actionError,
     gamePaused,
     gameReset,
     gameResumed,
