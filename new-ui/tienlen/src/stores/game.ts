@@ -268,7 +268,10 @@ export const useGameStore = defineStore('game', () => {
   return {
     connState,
     events,
+    isInLobby,
     isInProgress,
+    isPaused,
+    lastPlayed,
     name,
     opponents,
     self,
