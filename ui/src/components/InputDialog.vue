@@ -1,28 +1,58 @@
+<script setup lang="ts">
+import { ref, computed } from 'vue'
+
+export interface Props {
+  title?: string
+  message?: string
+  default?: string
+  confirmButtonText?: string
+  cancelButtonText?: string
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  title: 'Input',
+  message: '',
+  default: '',
+  confirmButtonText: 'Confirm',
+  cancelButtonText: 'Cancel',
+})
+
+const emit = defineEmits<{
+  (e: 'confirm', confirmed: boolean, data: string): void
+}>()
+
+const name = ref(props.default)
+
+const validName = computed(() => name.value !== props.default && name.value !== '')
+
+const handleClickButton = (confirm: boolean) => {
+  emit('confirm', confirm, name.value)
+}
+
+const handleClickOverlay = () => {
+  emit('confirm', false, name.value)
+}
+</script>
+
 <template>
   <transition name="fade">
-    <div id="vueConfirm" :class="$style.overlay" @click="handleClickOverlay">
+    <div class="shade" @click="handleClickOverlay">
       <transition name="zoom">
-        <div :class="$style.container">
-          <span :class="$style.textgrid">
-            <h4 v-if="title" :class="$style.title">{{ title }}</h4>
-            <p v-if="message" :class="$style.message">{{ message }}</p>
-            <input
-              v-model="name"
-              :class="$style.input"
-              type="text"
-              maxlength="35"
-              placeholder="Enter something..."
-            />
-          </span>
-          <div :class="$style.btngrid">
-            <button
-              :class="[$style.btn, $style.btnleft]"
-              :disabled="!validName"
-              @click.stop="(e) => handleClickButton(e, true)"
-            >
+        <div class="dialog">
+          <h4 v-if="title">{{ title }}</h4>
+          <p v-if="message" class="message">{{ message }}</p>
+          <input
+            v-model="name"
+            class="input"
+            type="text"
+            maxlength="35"
+            placeholder="Enter something..."
+          />
+          <div class="buttonRow">
+            <button class="button" @click.stop="() => handleClickButton(true)">
               {{ confirmButtonText }}
             </button>
-            <button :class="$style.btn" @click.stop="(e) => handleClickButton(e, false)">
+            <button class="button" @click.stop="() => handleClickButton(false)">
               {{ cancelButtonText }}
             </button>
           </div>
@@ -32,207 +62,61 @@
   </transition>
 </template>
 
-<script lang="ts">
-import { defineComponent, computed, ref } from '@vue/composition-api';
-
-interface event {
-  target?: {
-    id: string;
-  };
+<style scoped>
+.shade {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.4);
 }
 
-export default defineComponent({
-  props: {
-    title: {
-      type: String,
-      default: 'Input',
-    },
-    message: {
-      type: String,
-      default: '',
-    },
-    default: {
-      type: String,
-      default: '',
-    },
-    confirmButtonText: {
-      type: String,
-      default: 'Confirm',
-    },
-    cancelButtonText: {
-      type: String,
-      default: 'Cancel',
-    },
-  },
-
-  setup(props, { emit }) {
-    const name = ref(props.default);
-    const validName = computed(() => name.value !== props.default && name.value !== '');
-
-    const handleClickButton = (event: event, confirm: boolean) => {
-      if (event.target?.id === 'vueConfirm') return;
-      emit('confirm', confirm, name.value);
-    };
-
-    const handleClickOverlay = (event: event) => {
-      if (event.target?.id === 'vueConfirm') emit('confirm', false, name.value);
-    };
-
-    return { name, validName, handleClickButton, handleClickOverlay };
-  },
-});
-</script>
-
-<style lang="postcss" module>
-:root {
-  --title-color: black;
-  --message-color: black;
-  --overlay-background-color: #0000004a;
-  --container-box-shadow: #0000004a 0px 3px 8px 0px;
-  --base-background-color: #ffffff;
-  --button-color: black;
-  --button-color-disabled: white;
-  --button-background-color: #ffffff;
-  --button-border-color: #e0e0e0;
-  --button-background-color-disabled: #b3b3b3;
-  --button-background-color-hover: #dceffa;
-  --button-box-shadow-active: inset 0 2px 0px 0px #00000014;
-  --input-background-color: #ebebeb;
-  --input-background-color-hover: #dfdfdf;
-  --font-size-m: 24px;
-  --font-size-s: 18px;
-  --font-weight-black: 1100;
-  --font-weight-bold: 600;
-  --font-weight-medium: 500;
-  --font-weight-normal: 400;
-  --font-weight-light: 300;
+.dialog {
+  background-color: #fff;
+  padding: 54px 58px;
+  width: 300px;
+  border-radius: 8px;
+  top: 50%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-50%);
+  position: fixed;
 }
-/**
-* Dialog
-*/
-.overlay *,
-.overlay *:before,
-.overlay *:after {
-  -webkit-box-sizing: border-box;
-  box-sizing: border-box;
-  text-decoration: none;
-  -webkit-touch-callout: none;
-  -moz-osx-font-smoothing: grayscale;
-  margin: 0;
-  padding: 0;
-}
-.title {
-  color: var(--title-color);
-  padding: 0 1rem;
-  width: 100%;
-  font-weight: var(--font-weight-black);
-  text-align: center;
-  font-size: var(--font-size-m);
-  line-height: initial;
-  margin-bottom: 15px;
-}
+
 .message {
-  color: var(--message-color);
-  padding: 0 1rem;
-  width: 100%;
-  font-weight: var(--font-weight-medium);
-  text-align: center;
-  font-size: var(--font-size-s);
-  line-height: initial;
+  margin-top: 10px;
 }
+
+.buttonRow {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: right;
+  margin-top: 40px;
+}
+
+.button {
+  margin-right: 12px;
+  height: 40px;
+
+  a {
+    font-style: normal;
+    font-weight: 600;
+    font-size: 15px;
+    line-height: 26px;
+    width: 191px;
+  }
+
+  &:last-child {
+    margin-right: 0;
+  }
+}
+
 .input {
   width: 100%;
   border-radius: 5px;
   padding: 10px;
   font-size: var(--font-size-s);
   transition: all ease-in-out 0.2s;
-}
-.overlay {
-  background-color: var(--overlay-background-color);
-  width: 100%;
-  height: 100%;
-  transition: all 0.1s ease-in;
-  left: 0;
-  top: 0;
-  z-index: 999999999999;
-  position: fixed;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  align-content: baseline;
-}
-.container {
-  background-color: var(--base-background-color);
-  border-radius: 1rem;
-  width: 400px;
-  height: auto;
-  display: grid;
-  grid-template-rows: 1fr max-content;
-  box-shadow: var(--container-box-shadow);
-}
-.textgrid {
-  padding: 1.2rem;
-}
-.btngrid {
-  width: 100%;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  border-radius: 0 0 1rem 1rem;
-  overflow: hidden;
-}
-.btn {
-  border-radius: 0 0 1rem 0;
-  color: var(--button-color);
-  background-color: var(--button-background-color);
-  border: 0;
-  font-size: 1.1rem;
-  border-top: 1px solid var(--button-border-color);
-  cursor: pointer;
-  outline: none;
-  min-height: 50px;
-}
-.btn:hover {
-  background-color: var(--button-background-color-hover);
-}
-.btn:active {
-  box-shadow: var(--button-box-shadow-active);
-}
-.btn:disabled {
-  color: var(--button-color-disabled);
-  background-color: var(--button-background-color-disabled);
-}
-.btnleft {
-  border-radius: 0;
-  border-right: 1px solid var(--button-border-color);
-}
-/**
-* Transition
-*/
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.21s;
-}
-.fade-enter,
-.fade-leave-to {
-  opacity: 0;
-}
-.zoom-enter-active,
-.zoom-leave-active {
-  animation-duration: 0.21s;
-  animation-fill-mode: both;
-  animation-name: zoom;
-}
-.zoom-leave-active {
-  animation-direction: reverse;
-}
-@keyframes zoom {
-  from {
-    opacity: 0;
-    transform: scale3d(1.1, 1.1, 1.1);
-  }
-  100% {
-    opacity: 1;
-    transform: scale3d(1, 1, 1);
-  }
 }
 </style>

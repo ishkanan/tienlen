@@ -8,8 +8,13 @@ const props = defineProps<{
   cards: Card[],
 }>()
 
+const emit = defineEmits<{
+  (e: 'selected', value: number[]): void
+}>()
+
 const orderedCards = ref<Card[]>([])
-const selectedMap = ref<Record<number, boolean>>({})
+const selectedMap = ref<Record<number, Boolean>>({})
+const drag = ref(false)
 
 watch(
   () => props.cards,
@@ -27,7 +32,7 @@ watch(
   { immediate: true },
 )
 
-const onSelectedToggle = (card: Card, selected: boolean) => {
+const onSelectedToggle = (card: Card, selected: Boolean) => {
   selectedMap.value[card.globalRank] = selected
   if (!selected) delete selectedMap.value[card.globalRank]
   orderedCards.value = orderedCards.value.slice()
@@ -48,21 +53,19 @@ const onSelectedToggle = (card: Card, selected: boolean) => {
     @start="drag = true"
     @end="drag = false"
   >
-    <template #item="{card}">
-      <CardView
-        v-for="card in orderedCards"
-        :key="card.globalRank"
-        :class="{
-          card: true,
-          raised: selectedMap[card.globalRank]
-        }"
-        :card="card"
-        :selectable="true"
-        :show-face="true"
-        @selected="(val) => onSelectedToggle(card, val)"
-      />
-    </Draggable>
-  </template>
+    <CardView
+      v-for="card in orderedCards"
+      :key="card.globalRank"
+      :class="{
+        card: true,
+        raised: selectedMap[card.globalRank]
+      }"
+      :card="card"
+      :selectable="true"
+      :show-face="true"
+      @selected="(val) => onSelectedToggle(card, val)"
+    />
+  </Draggable>
 </template>
 
 <style scoped>
