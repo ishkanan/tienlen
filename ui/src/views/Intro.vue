@@ -1,8 +1,10 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
-import { joinGame } from '../lib/socket'
+import { computed, inject, onMounted, ref } from 'vue'
+import { type Socket } from '../lib/socket'
 import { setTitle } from '../lib/utils'
 import { useGameStore, ConnectionState } from '../stores/game'
+
+const socket: Socket | undefined = inject('socket')
 
 const name = ref('')
 
@@ -21,7 +23,7 @@ const canSubmit = computed(() => validName.value && disconnected.value)
 
 const handleConnect = () => {
   gameStore.name = name.value
-  joinGame({ name: name.value })
+  socket?.joinGame({ name: name.value })
 }
 
 onMounted(() => {

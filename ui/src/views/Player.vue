@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, inject, ref, watch } from 'vue'
 import CardView from '../components/Card.vue'
 import Hand from '../components/Hand.vue'
 import { type Card, Suit, EventSeverity } from '../lib/models'
+import { type Socket } from '../lib/socket'
 import { ordinalise, startFlashTitle } from '../lib/utils'
-import { requestStartGame, requestTurnPass, requestTurnPlay } from '../lib/socket'
 import { useGameStore } from '../stores/game'
+
+const socket: Socket | undefined = inject('socket')
 
 const autoPassed = ref(false)
 const autoPassing = ref(false)
@@ -58,8 +60,8 @@ const paused = computed(() => gameStore.isPaused)
 const passed = computed(() => player.value?.isPassed ?? false)
 const newRound = computed(() => gameStore.newRound)
 
-const doStart = () => requestStartGame()
-const doPass = () => requestTurnPass()
+const doStart = () => socket?.requestStartGame()
+const doPass = () => socket?.requestTurnPass()
 const doPlay = () => {
   const cards = selectedRanks.value.reduce<Card[]>((memo, rank) => {
     const card = gameStore.selfHand.find(c => c.globalRank === rank)
@@ -67,7 +69,7 @@ const doPlay = () => {
     memo.push(card)
     return memo
   }, [])
-  requestTurnPlay({ cards })
+  socket?.requestTurnPlay({ cards })
 }
 const onSelected = (ranks: number[]) => (selectedRanks.value = ranks)
 

@@ -1,31 +1,3 @@
-<template>
-  <div class="viewport">
-    <div
-      v-for="(event, i) in events"
-      :key="i"
-      :class="{
-        event,
-        error: event.isError,
-        warning: event.isWarning,
-        success: event.isSuccess,
-      }"
-    >
-      <template v-for="(rune, j) in event.runes">
-        <p v-if="j === 0" :key="j" class="rune runeTime">
-          {{ `[${event.timestamp}]:` }}
-        </p>
-        <p v-if="rune.isMessage" :key="j * 3 + 1" class="rune">{{ rune.message }}</p>
-        <p
-          v-if="rune.card"
-          :key="j * 3 + 2"
-          class="rune runeCard"
-          :style="runeCardImageStyle(rune.card)"
-        />
-      </template>
-    </div>
-  </div>
-</template>
-
 <script setup lang="ts">
 import { format } from 'date-fns'
 import { orderBy } from 'lodash-es'
@@ -81,8 +53,35 @@ const runeCardImageStyle = (card: Card): Record<string, string> => {
     backgroundPosition: `top -${offsetY}px left -${offsetX}px`,
   }
 }
-
 </script>
+
+<template>
+  <div class="viewport">
+    <div
+      v-for="(event, i) in events"
+      :key="i"
+      :class="{
+        event,
+        error: event.isError,
+        warning: event.isWarning,
+        success: event.isSuccess,
+      }"
+    >
+      <template v-for="(rune, j) in event.runes">
+        <p v-if="j === 0" :key="j" class="rune runeTime">
+          {{ `[${event.timestamp}]:` }}
+        </p>
+        <p v-if="rune.isMessage" :key="j * 3 + 1" class="rune">{{ rune.message }}</p>
+        <p
+          v-if="rune.card"
+          :key="j * 3 + 2"
+          class="rune runeCard"
+          :style="runeCardImageStyle(rune.card)"
+        />
+      </template>
+    </div>
+  </div>
+</template>
 
 <style scoped>
 .viewport {

@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, inject, ref } from 'vue'
 import ConfirmDialog from '../components/ConfirmDialog.vue'
 import InputDialog from '../components/InputDialog.vue'
-import { requestChangeName, requestResetGame } from '../lib/socket'
+import { type Socket } from '../lib/socket'
 import { useGameStore } from '../stores/game'
+
+const socket: Socket | undefined = inject('socket')
 
 const gameStore = useGameStore()
 
@@ -14,7 +16,7 @@ const showInput = ref(false)
 const doNameInput = () => (showInput.value = true)
 
 const handleNameInput = (confirm: boolean, name: string) => {
-  if (confirm) requestChangeName({ name })
+  if (confirm) socket?.requestChangeName({ name })
   showInput.value = false
 }
 
@@ -23,7 +25,7 @@ const showConfirm = ref(false)
 const doResetConfirm = () => (showConfirm.value = true)
 
 const handleConfirm = (confirm: boolean) => {
-  if (confirm) requestResetGame()
+  if (confirm) socket?.requestResetGame()
   showConfirm.value = false
 }
 </script>
