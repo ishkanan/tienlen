@@ -46,6 +46,7 @@ const onSelectedToggle = (card: Card, selected: Boolean) => {
 <template>
   <Draggable
     :list="orderedCards"
+    item-key="globalRank"
     class="hand"
     group="cards"
     delay="150"
@@ -53,18 +54,18 @@ const onSelectedToggle = (card: Card, selected: Boolean) => {
     @start="drag = true"
     @end="drag = false"
   >
-    <CardView
-      v-for="card in orderedCards"
-      :key="card.globalRank"
-      :class="{
-        card: true,
-        raised: selectedMap[card.globalRank]
-      }"
-      :card="card"
-      :selectable="true"
-      :show-face="true"
-      @selected="(val) => onSelectedToggle(card, val)"
-    />
+    <template #item="{element}: {element: Card}">
+      <CardView
+        :class="{
+          card: true,
+          raised: selectedMap[element.globalRank]
+        }"
+        :card="element"
+        :selectable="true"
+        :show-face="true"
+        @selected="(val) => onSelectedToggle(element, val)"
+      />
+    </template>
   </Draggable>
 </template>
 
