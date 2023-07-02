@@ -17,7 +17,7 @@
     "lodash-es": "^4.17.21",
     "pinia": "^2.1.3",
     "vue": "^3.3.4",
-    "vue-toasted": "^1.1.28",
+    "vue3-toastify": "^0.1.11",
     "vuedraggable": "^4.1.0"
   },
   "devDependencies": {

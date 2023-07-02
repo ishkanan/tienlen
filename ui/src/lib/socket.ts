@@ -1,14 +1,47 @@
-import { useGameStore, ConnectionState } from '../stores/game'
-import { type Card } from './models'
+import { ConnectionState } from '../stores/game'
 import {
-  type Message,
-  type JoinGameRequest,
-  type StartGameRequest,
-  type TurnPassRequest,
-  type TurnPlayRequest,
-  type ResetGameRequest,
   type ChangeNameRequest,
+  type ErrorResponse,
+  type GamePausedResponse,
+  type GameResetResponse,
+  type GameResumedResponse,
+  type GameStartedResponse,
+  type GameStateRefreshResponse,
+  type GameWonResponse,
+  type JoinGameRequest,
+  type Message,
+  type NameChangedResponse,
+  type PlayerDisconnectedResponse,
+  type PlayerJoinedResponse,
+  type PlayerPlacedResponse,
+  type ResetGameRequest,
+  type RoundWonResponse,
+  type StartGameRequest,
+  type TurnPassedResponse,
+  type TurnPassRequest,
+  type TurnPlayedResponse,
+  type TurnPlayRequest,
 } from './messages'
+import { type Card } from './models'
+
+export interface Store {
+  connState: ConnectionState
+  actionError: ({ response }: { response: ErrorResponse }) => void
+  gamePaused: ({ _ }: { _: GamePausedResponse }) => void
+  gameReset: ({ response }: { response: GameResetResponse }) => void
+  gameResumed: ({ _ }: { _: GameResumedResponse }) => void
+  gameStarted: ({ response }: { response: GameStartedResponse }) => void
+  gameStateRefresh: ({ response }: { response: GameStateRefreshResponse }) => void
+  gameWon: ({ response }: { response: GameWonResponse }) => void
+  nameChanged: ({ response }: { response: NameChangedResponse }) => void
+  playerDisconnected: ({ response }: { response: PlayerDisconnectedResponse }) => void
+  playerJoined: ({ response }: { response: PlayerJoinedResponse }) => void
+  playerPlaced: ({ response }: { response: PlayerPlacedResponse }) => void
+  roundWon: ({ response }: { response: RoundWonResponse }) => void
+  selfDisconnected: () => void
+  turnPassed: ({ response }: { response: TurnPassedResponse }) => void
+  turnPlayed: ({ response }: { response: TurnPlayedResponse }) => void
+}
 
 export interface Socket {
   joinGame: ({ name }: { name: string }) => void
@@ -19,7 +52,9 @@ export interface Socket {
   requestTurnPlay: ({ cards }: { cards: Card[] }) => void
 }
 
-export function init(): Socket {
+export const init = (store: Store): Socket => {
+  let socket: WebSocket | undefined = undefined
+
   const wsUrl =
     window.location.protocol.replace('http', 'ws') +
     '//' +
@@ -27,26 +62,23 @@ export function init(): Socket {
     window.location.pathname +
     (window.location.pathname.endsWith('/') ? 'api' : '/api')
 
-  let gameState = useGameStore()
-  let socket: WebSocket | undefined = undefined
-
   const joinGame = ({ name }: { name: string }): void => {
     if (socket) socket.close()
 
-    gameState.connState = ConnectionState.Connecting
+    store.connState = ConnectionState.Connecting
 
     socket = new WebSocket(wsUrl, 'json')
-    socket.onmessage = onMessage
-    socket.onclose = onClose
-    socket.onerror = onError
-    socket.onopen = () => {
-      gameState.connState = ConnectionState.Connected
+    socket.addEventListener('message', onMessage)
+    socket.addEventListener('close', onClose)
+    socket.addEventListener('error', onError)
+    socket.addEventListener('open', () => {
+      store.connState = ConnectionState.Connected
       const request: JoinGameRequest = { playerName: name }
       sendMessage({
         kind: 'JOIN_GAME',
         request,
       })
-    }
+    })
   }
 
   const requestStartGame = (): void => {
@@ -102,7 +134,7 @@ export function init(): Socket {
       | ResetGameRequest
       | ChangeNameRequest
   }) => {
-    if (!socket || gameState.connState !== ConnectionState.Connected) return
+    if (!socket || store.connState !== ConnectionState.Connected) return
     const message: Message = {
       kind,
       data: btoa(JSON.stringify(request)),
@@ -110,33 +142,34 @@ export function init(): Socket {
     socket.send(JSON.stringify(message))
   }
 
-  // eslint-disable-next-line
-  const actions: Record<string, any> = {
-    PLAYER_JOINED: gameState.playerJoined,
-    PLAYER_DISCONNECTED: gameState.playerDisconnected,
-    GAME_STARTED: gameState.gameStarted,
-    GAME_PAUSED: gameState.gamePaused,
-    GAME_RESUMED: gameState.gameResumed,
-    GAME_RESET: gameState.gameReset,
-    TURN_PASSED: gameState.turnPassed,
-    ROUND_WON: gameState.roundWon,
-    TURN_PLAYED: gameState.turnPlayed,
-    NAME_CHANGED: gameState.nameChanged,
-    PLAYER_PLACED: gameState.playerPlaced,
-    GAME_WON: gameState.gameWon,
-    GAME_STATE_REFRESH: gameState.gameStateRefresh,
-    ERROR: gameState.actionError,
-  }
-
   const onMessage = (event: MessageEvent) => {
     const message: Message | undefined = JSON.parse(event.data)
     if (!message) return
+
     const parsed: unknown = JSON.parse(atob(message.data))
+
+    const actions: Record<string, Function> = {
+      PLAYER_JOINED: store.playerJoined,
+      PLAYER_DISCONNECTED: store.playerDisconnected,
+      GAME_STARTED: store.gameStarted,
+      GAME_PAUSED: store.gamePaused,
+      GAME_RESUMED: store.gameResumed,
+      GAME_RESET: store.gameReset,
+      TURN_PASSED: store.turnPassed,
+      ROUND_WON: store.roundWon,
+      TURN_PLAYED: store.turnPlayed,
+      NAME_CHANGED: store.nameChanged,
+      PLAYER_PLACED: store.playerPlaced,
+      GAME_WON: store.gameWon,
+      GAME_STATE_REFRESH: store.gameStateRefresh,
+      ERROR: store.actionError,
+    }
+    
     actions[message.kind] && actions[message.kind]({ response: parsed })
   }
 
   const onClose = () => {
-    gameState.selfDisconnected()
+    store.selfDisconnected()
   }
 
   const onError = (event: Event) => {

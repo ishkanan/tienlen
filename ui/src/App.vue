@@ -1,11 +1,14 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, provide } from 'vue'
 import Game from './views/Game.vue'
 import Intro from './views/Intro.vue'
 import Toaster from './views/Toaster.vue'
 import { useGameStore, ConnectionState } from './stores/game'
+import { init } from './lib/socket'
 
 const gameStore = useGameStore()
+
+provide('socket', init(gameStore))
 
 const connected = computed(() => gameStore.connState === ConnectionState.Connected)
 </script>
