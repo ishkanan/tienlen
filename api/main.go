@@ -14,8 +14,8 @@ var addr = flag.String("addr", "localhost:27000", "HTTP service address")
 var uiFolder = flag.String("ui", "dist", "Folder container UI files")
 
 func main() {
-	fmt.Println("Tiến lên (aka. Thirteen) server\n" +
-		"  A simple server implementation of the popular Vietnamese card game.\n",
+	fmt.Print("Tiến lên (aka. Thirteen) server\n" +
+		"  A simple server implementation of the popular Vietnamese card game.\n\n",
 	)
 
 	flag.Parse()
