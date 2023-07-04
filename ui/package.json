@@ -16,6 +16,7 @@
     "date-fns": "^2.30.0",
     "lodash-es": "^4.17.21",
     "pinia": "^2.1.3",
+    "uuid": "^9.0.0",
     "vue": "^3.3.4",
     "vue3-toastify": "^0.1.11",
     "vuedraggable": "^4.1.0"
@@ -26,6 +27,7 @@
     "@types/jsdom": "^21.1.1",
     "@types/lodash-es": "^4.17.7",
     "@types/node": "^18.16.17",
+    "@types/uuid": "^9.0.2",
     "@vitejs/plugin-vue": "^4.2.3",
     "@vitejs/plugin-vue-jsx": "^3.0.1",
     "@vue/eslint-config-prettier": "^7.1.0",
