@@ -56,8 +56,8 @@ const uuid = () => uuidv4()
 }
 
 p {
-  font-size: 20px;
-  font-weight: 100;
+  font-size: 16px;
+  font-weight: 90;
   margin: 0;
   word-wrap: break-word;
 }

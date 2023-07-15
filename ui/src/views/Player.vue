@@ -130,10 +130,12 @@ watch(
       <button v-if="canStart" @click="doStart">Start game</button>
       <button v-if="canPlay" :disabled="!cardsSelected" @click="doPlay">Play cards</button>
       <button v-if="canPass" class="danger" @click="doPass">Pass turn</button>
-      <h2 v-if="autoPassing">Your turn will be automatically passed...</h2>
-      <h2 v-if="passed">You have passed! Sit tight.</h2>
-      <h2 v-else-if="waiting">Waiting for turn...</h2>
-      <h2 v-if="winPlace > 0 && !canStart">All done bucko! Have a break.</h2>
+      <h3 v-if="autoPassing">Your turn will be automatically passed...</h3>
+
+      <h3 v-if="passed">You have passed! Sit tight.</h3>
+      <h3 v-else-if="waiting">Waiting for turn...</h3>
+
+      <h3 v-if="winPlace > 0 && !canStart">All done bucko! Have a break.</h3>
     </div>
 
     <div class="hand">
@@ -153,37 +155,41 @@ watch(
     </div>
 
     <div class="nameBar">
-      <h3 :class="{ isTurn: player.isTurn }">{{ player.name }}</h3>
+      <h4 :class="{ isTurn: player.isTurn }">{{ player.name }}</h4>
     </div>
   </div>
 </template>
 
 <style scoped>
 .viewport {
-  width: 100%;
   height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .controls {
+  max-height: 40px;
   color: white;
-  height: 40px;
+  flex-basis: 34%;
+  padding: 10px 0;
   display: flex;
-  flex-direction: row;
   justify-content: center;
-  padding-top: 15px;
 
   & button:nth-child(2) {
     margin-left: 80px;
   }
 
-  & h2 {
-    margin: 0px;
+  & h3 {
+    margin: 0;
   }
 }
 
 .hand {
+  flex-basis: 60%;
+  display: flex;
+  justify-content: center;
   max-width: 100%;
-  padding-top: 15px;
 
   & .placed {
     width: 100px;
@@ -210,22 +216,21 @@ watch(
 }
 
 .nameBar {
+  flex-basis: 6%;
   display: flex;
-  flex-direction: row;
-  align-items: center;
   justify-content: center;
 
-  & h3 {
+  & h4 {
     color: #f2f2f2;
-    margin: 10px 0 10px 0;
-    padding: 2px 6px 2px 6px;
+    margin: 5px 0;
+    padding: 2px 6px;
 
     &.isTurn {
       background-color: #f2f2f2;
       border-radius: 5px;
       color: black;
       border: 1px solid black;
-      padding: 1px 5px 1px 5px;
+      padding: 1px 5px;
     }
   }
 }

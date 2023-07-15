@@ -38,7 +38,7 @@ const handleClickOverlay = () => {
   <transition name="fade">
     <div class="shade" @click="handleClickOverlay">
       <transition name="zoom">
-        <div class="dialog">
+        <div class="dialog" @click.stop>
           <h4 v-if="title">{{ title }}</h4>
           <p v-if="message" class="message">{{ message }}</p>
           <input
@@ -75,13 +75,17 @@ const handleClickOverlay = () => {
 
 .dialog {
   background-color: #fff;
-  padding: 54px 58px;
+  padding: 20px;
   width: 300px;
   border-radius: 8px;
   top: 50%;
   left: 50%;
   transform: translateX(-50%) translateY(-50%);
   position: fixed;
+
+  & h4 {
+    margin-top: 0;
+  }
 }
 
 .message {
@@ -113,7 +117,7 @@ const handleClickOverlay = () => {
 }
 
 .input {
-  width: 100%;
+  width: 90%;
   border-radius: 5px;
   padding: 10px;
   font-size: var(--font-size-s);

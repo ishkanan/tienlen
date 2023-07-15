@@ -25,18 +25,18 @@
 }
 
 .player {
-  grid-area: 12 / 5 / 18 / 37;
+  grid-area: 11 / 5 / 18 / 37;
 }
 
 .discard {
-  grid-area: 7 / 9 / 12 / 33;
+  grid-area: 6 / 9 / 11 / 33;
 }
 
 .opponent1 {
-  grid-area: 1 / 5 / 6 / 15;
+  grid-area: 1 / 5 / 5 / 15;
 }
 
 .opponent2 {
-  grid-area: 1 / 27 / 6 / 37;
+  grid-area: 1 / 27 / 5 / 37;
 }
 </style>

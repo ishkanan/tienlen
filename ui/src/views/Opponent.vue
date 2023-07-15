@@ -54,7 +54,7 @@ watch(
   <div v-if="opponent" class="viewport">
     <div class="player">
       <span class="nameBar">
-        <h3 :class="{ isTurn: opponent.isTurn }">{{ opponent.name }}</h3>
+        <h4 :class="{ isTurn: opponent.isTurn }">{{ opponent.name }}</h4>
       </span>
 
       <div v-if="!opponent.connected" class="disconnected" />
@@ -65,7 +65,7 @@ watch(
 
       <template v-else>
         <CardView class="card" :card="unfaced" :selectable="false" :show-face="false" />
-        <h1 v-if="opponent.cardsLeft > 0" class="cardsLeft">x {{ opponent.cardsLeft }}</h1>
+        <h2 v-if="opponent.cardsLeft > 0" class="cardsLeft">x {{ opponent.cardsLeft }}</h2>
         <div v-if="passed" class="passed" />
       </template>
     </div>
@@ -92,7 +92,7 @@ watch(
   }
 
   & .cardsLeft {
-    top: -103px;
+    top: -98px;
     width: 80px;
     color: #f2f2f2;
     text-align: center;
@@ -125,7 +125,7 @@ watch(
     }
   }
 
-  & h3 {
+  & h4 {
     color: #f2f2f2;
     margin: 10px 0 10px 0;
     padding: 2px 6px 2px 6px;

@@ -42,9 +42,9 @@ const scores = computed<ScoreLine[]>(() => {
 <template>
   <div class="viewport">
     <div v-for="scoreLine in scores" :key="scoreLine.playerName" class="scoreLine">
-      <h2>{{ scoreLine.playerName }}</h2>
-      <h2 v-if="scoreLine.delta > 0">{{ scoreLine.score }} ( + {{ scoreLine.delta }} )</h2>
-      <h2 v-else>{{ scoreLine.score }}</h2>
+      <h3>{{ scoreLine.playerName }}</h3>
+      <h3 v-if="scoreLine.delta > 0">{{ scoreLine.score }} ( + {{ scoreLine.delta }} )</h3>
+      <h3 v-else>{{ scoreLine.score }}</h3>
     </div>
   </div>
 </template>
@@ -65,7 +65,7 @@ const scores = computed<ScoreLine[]>(() => {
     justify-content: space-between;
   }
 
-  & h2 {
+  & h3 {
     margin: 0;
   }
 }

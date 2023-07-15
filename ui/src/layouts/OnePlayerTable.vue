@@ -19,10 +19,10 @@
 }
 
 .player {
-  grid-area: 12 / 5 / 18 / 37;
+  grid-area: 11 / 5 / 18 / 37;
 }
 
 .discard {
-  grid-area: 7 / 9 / 12 / 33;
+  grid-area: 6 / 9 / 11 / 33;
 }
 </style>

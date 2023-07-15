@@ -33,6 +33,7 @@ watch(
 )
 
 const onSelectedToggle = (card: Card, selected: Boolean) => {
+  console.log(card)
   selectedMap.value[card.globalRank] = selected
   if (!selected) delete selectedMap.value[card.globalRank]
   orderedCards.value = orderedCards.value.slice()
@@ -44,33 +45,31 @@ const onSelectedToggle = (card: Card, selected: Boolean) => {
 </script>
 
 <template>
-  <div>
-    <Draggable
-      :list="orderedCards"
-      item-key="globalRank"
-      class="hand"
-      group="cards"
-      delay="150"
-      delay-on-touch-only="true"
-      @start="drag = true"
-      @end="drag = false"
-    >
-      <template #item="{element}: {element: Card}">
-        <div :class="{
-            card: true,
-            raised: selectedMap[element.globalRank]
-          }"
-        >
-          <CardView
-            :card="element"
-            :selectable="true"
-            :show-face="true"
-            @selected="(val) => onSelectedToggle(element, val)"
-          />
-        </div>
-      </template>
-    </Draggable>
-  </div>
+  <Draggable
+    v-model="orderedCards"
+    item-key="globalRank"
+    class="hand"
+    group="cards"
+    delay="150"
+    delay-on-touch-only="true"
+    @start="drag = true"
+    @end="drag = false"
+  >
+    <template #item="{element}: {element: Card}">
+      <div :class="{
+          card: true,
+          raised: selectedMap[element.globalRank]
+        }"
+      >
+        <CardView
+          :card="element"
+          :selectable="true"
+          :show-face="true"
+          @selected="(val) => onSelectedToggle(element, val)"
+        />
+      </div>
+    </template>
+  </Draggable>
 </template>
 
 <style scoped>
@@ -81,11 +80,10 @@ const onSelectedToggle = (card: Card, selected: Boolean) => {
 }
 
 .card {
-  padding-top: 30px;
-  border-radius: 8px;
+  padding: 30px 0 0 0;
 }
 
 .raised {
-  padding-top: 0px !important;
+  padding: 0 0 30px 0 !important;
 }
 </style>

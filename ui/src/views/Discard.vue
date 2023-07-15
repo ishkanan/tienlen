@@ -30,6 +30,7 @@ const previousWinner = computed(() => {
 <template>
   <div :class="{ viewport: true, winner: previousWinner && inLobby }">
     <h1 v-if="paused" class="message">Game is paused!</h1>
+
     <template v-else-if="inLobby && previousWinner === undefined">
       <h1 v-if="needMorePlayers && !canStart" class="message">Wait for more players...</h1>
       <h1 v-else-if="needMorePlayers && canStart" class="message">
@@ -39,14 +40,15 @@ const previousWinner = computed(() => {
       </h1>
       <h1 v-else class="message">Start the game...</h1>
     </template>
+
     <template v-else>
       <div class="messageAndLastPlayed">
-        <h2 v-if="inLobby && previousWinner">
+        <h3 v-if="inLobby && previousWinner">
           The game has finished! One more?
-        </h2>
-        <h2 v-else-if="lastPlayedCards.length > 0 && !!lastPlayed">
+        </h3>
+        <h3 v-else-if="lastPlayedCards.length > 0 && !!lastPlayed">
           {{ lastPlayed.name }} played:
-        </h2>
+        </h3>
         <div class="lastPlayed">
           <CardView
             v-for="card in lastPlayedCards"
@@ -80,6 +82,10 @@ const previousWinner = computed(() => {
   align-items: center;
   flex-direction: column;
   justify-content: center;
+
+  & h3 {
+    margin: 5px 0 0;
+  }
 }
 
 .lastPlayed {

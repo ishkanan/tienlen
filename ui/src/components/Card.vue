@@ -47,6 +47,7 @@ const onClick = () => {
 
 <style scoped>
 .tile {
+  border-radius: 8px;
   cursor: default;
 }
 
