@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, provide } from 'vue'
-import Game from './views/Game.vue'
-import Intro from './views/Intro.vue'
+import Game from './screens/Game.vue'
+import Intro from './screens/Intro.vue'
 import Toaster from './views/Toaster.vue'
 import { useGameStore, ConnectionState } from './stores/game'
 import { init } from './lib/socket'
@@ -25,8 +25,5 @@ const connected = computed(() => gameStore.connState === ConnectionState.Connect
 .app {
   height: 100vh;
   width: 100vw;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 </style>

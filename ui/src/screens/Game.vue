@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed, watch } from 'vue'
-import InGameLayout from '../layouts/InGame.vue'
 import OnePlayerLayout from '../layouts/OnePlayerTable.vue'
 import TwoPlayerLayout from '../layouts/TwoPlayerTable.vue'
 import ThreePlayerLayout from '../layouts/ThreePlayerTable.vue'
@@ -58,8 +57,8 @@ watch(
 </script>
 
 <template>
-  <InGameLayout>
-    <template #gameTable>
+  <div class="page">
+    <div class="gameTable">
       <OnePlayerLayout v-if="player && opponents.length === 0">
         <template #discard><DiscardView /></template>
         <template #player><PlayerView /></template>
@@ -98,21 +97,69 @@ watch(
           </div>
         </template>
       </FourPlayerLayout>
-    </template>
-    <template #scoreArea>
-      <ScoreView />
-    </template>
-    <template #controlsArea>
-      <ControlsView />
-    </template>
-    <template #activityArea>
-      <ActivityView />
-    </template>
-  </InGameLayout>
+    </div>
+
+    <div class="headsUp">
+      <ControlsView class="controlsArea" />
+      <ScoreView class="scoreArea" />
+      <ActivityView class="activityArea" />
+    </div>
+  </div>
 </template>
 
 <style scoped>
-.nudge {
-  margin-top: 6%;
+.page {
+  width: 100%;
+  height: 100%;
+  /* padding-top: 50px; */
+}
+
+.gameTable {
+  width: 95%;
+  height: 70%;
+  max-height: 750px;
+  max-width: 1500px;
+  margin: 0 auto;
+  /* padding: 10px; */
+  background-color: rgba(48, 112, 16, 0.7);
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  border: 4mm ridge rgba(170, 50, 50, 0.6);
+  border-radius: 5%;
+
+  & .nudge {
+    margin-top: 6%;
+  }
+}
+
+.headsUp {
+  width: 96%;
+  height: 30%;
+  max-height: 30%;
+  max-width: 1530px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin: 5px auto 0 auto;
+
+  & .controlsArea {
+    flex-basis: 12%;
+    height: 200px;
+    background-color: rgba(255, 255, 255, 0.6);
+    border: 3px black double;
+  }
+
+  & .scoreArea {
+    flex-basis: 33%;
+    height: 200px;
+    background-color: rgba(255, 255, 255, 0.6);
+    border: 3px black double;
+  }
+
+  & .activityArea {
+    flex-basis: 55%;
+    height: 200px;
+    background-color: rgba(50, 50, 50, 0.8);
+    border: 3px black double;
+  }
 }
 </style>

@@ -44,43 +44,48 @@ const onSelectedToggle = (card: Card, selected: Boolean) => {
 </script>
 
 <template>
-  <Draggable
-    :list="orderedCards"
-    item-key="globalRank"
-    class="hand"
-    group="cards"
-    delay="150"
-    delay-on-touch-only="true"
-    @start="drag = true"
-    @end="drag = false"
-  >
-    <template #item="{element}: {element: Card}">
-      <CardView
-        :class="{
-          card: true,
-          raised: selectedMap[element.globalRank]
-        }"
-        :card="element"
-        :selectable="true"
-        :show-face="true"
-        @selected="(val) => onSelectedToggle(element, val)"
-      />
-    </template>
-  </Draggable>
+  <div>
+    <Draggable
+      :list="orderedCards"
+      item-key="globalRank"
+      class="hand"
+      group="cards"
+      delay="150"
+      delay-on-touch-only="true"
+      @start="drag = true"
+      @end="drag = false"
+    >
+      <template #item="{element}: {element: Card}">
+        <div :class="{
+            card: true,
+            raised: selectedMap[element.globalRank]
+          }"
+        >
+          <CardView
+            :card="element"
+            :selectable="true"
+            :show-face="true"
+            @selected="(val) => onSelectedToggle(element, val)"
+          />
+        </div>
+      </template>
+    </Draggable>
+  </div>
 </template>
 
 <style scoped>
 .hand {
-  width: 100%;
-  display: flex;
   justify-content: center;
+  display: grid;
+  grid-template-columns: repeat(auto-fit,  minmax(10px, max-content));
 }
 
 .card {
-  margin-top: 30px;
+  padding-top: 30px;
+  border-radius: 8px;
 }
 
 .raised {
-  margin-top: 0px !important;
+  padding-top: 0px !important;
 }
 </style>

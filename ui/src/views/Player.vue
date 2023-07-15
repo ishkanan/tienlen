@@ -161,33 +161,29 @@ watch(
 <style scoped>
 .viewport {
   width: 100%;
-  max-height: 100%;
-  margin: 15px 0 0 0;
+  height: 100%;
 }
 
 .controls {
-  width: 100%;
   color: white;
   height: 40px;
   display: flex;
   flex-direction: row;
   justify-content: center;
+  padding-top: 15px;
 
   & button:nth-child(2) {
     margin-left: 80px;
   }
 
-  & h1 {
-    color: white;
+  & h2 {
+    margin: 0px;
   }
 }
 
 .hand {
-  width: 100%;
-  margin-top: 15px;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
+  max-width: 100%;
+  padding-top: 15px;
 
   & .placed {
     width: 100px;
@@ -218,19 +214,19 @@ watch(
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  color: #f2f2f2;
 
   & h3 {
+    color: #f2f2f2;
     margin: 10px 0 10px 0;
     padding: 2px 6px 2px 6px;
-  }
 
-  & .isTurn {
-    background-color: #f2f2f2;
-    border-radius: 5px;
-    color: black;
-    border: 1px solid black;
-    padding: 1px 5px 1px 5px;
+    &.isTurn {
+      background-color: #f2f2f2;
+      border-radius: 5px;
+      color: black;
+      border: 1px solid black;
+      padding: 1px 5px 1px 5px;
+    }
   }
 }
 </style>

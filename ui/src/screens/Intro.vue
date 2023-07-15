@@ -33,19 +33,30 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="viewport">
-    <h1>Welcome to Tiến lên online!</h1>
-    <div class="controls">
-      <input v-model="name" type="text" maxlength="35" placeholder="Enter your name..." />
-      <button :disabled="!canSubmit" @click="handleConnect">Connect</button>
+  <div class="page">
+    <div class="viewport">
+      <h1>Welcome to Tiến lên online!</h1>
+      <div class="controls">
+        <input v-model="name" type="text" maxlength="35" placeholder="Enter your name..." />
+        <button :disabled="!canSubmit" @click="handleConnect">Connect</button>
+      </div>
     </div>
   </div>
 </template>
 
 <style scoped>
+.page {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .viewport {
-  width: 600px;
-  height: 200px;
+  width: 50%;
+  height: 30%;
+  max-width: 600px;
+  max-height: 200px;
   background-color: rgba(48, 112, 16, 0.7);
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
   border: 4mm ridge rgba(170, 50, 50, 0.6);
