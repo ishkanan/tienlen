@@ -11,6 +11,7 @@ const meta = {
     message: { control: 'string' },
     confirmButtonText: { control: 'string' },
     cancelButtonText: { control: 'string' },
+    onConfirm: { action: 'clicked' },
   },
   args: { },
 } satisfies Meta<typeof ConfirmDialog>
