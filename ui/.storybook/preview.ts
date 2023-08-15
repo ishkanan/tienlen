@@ -1,6 +1,7 @@
 import type { Preview } from '@storybook/vue3'
 
 import '../src/assets/css/global.css'
+import '../src/assets/css/bulma-0.9.4.min.css'
 
 const preview: Preview = {
   parameters: {

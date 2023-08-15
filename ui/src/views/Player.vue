@@ -127,9 +127,9 @@ watch(
 <template>
   <div v-if="player" class="viewport">
     <div class="controls">
-      <button v-if="canStart" class="button" @click="doStart">Start game</button>
-      <button v-if="canPlay" class="button" :disabled="!cardsSelected" @click="doPlay">Play cards</button>
-      <button v-if="canPass" class="button" @click="doPass">Pass turn</button>
+      <button v-if="canStart" class="button is-info" @click="doStart">Start game</button>
+      <button v-if="canPlay" class="button is-info" :disabled="!cardsSelected" @click="doPlay">Play cards</button>
+      <button v-if="canPass" class="button is-info" @click="doPass">Pass turn</button>
       <h3 v-if="autoPassing">Your turn will be automatically passed...</h3>
 
       <h3 v-if="passed">You have passed! Sit tight.</h3>

@@ -32,8 +32,8 @@ const handleConfirm = (confirm: boolean) => {
 
 <template>
   <div class="viewport">
-    <button class="button" @click="doNameInput">Change name</button>
-    <button class="button" @click="doResetConfirm">Reset game</button>
+    <button class="button is-info" @click="doNameInput">Change name</button>
+    <button class="button is-danger" @click="doResetConfirm">Reset game</button>
     <InputDialog
       v-if="showInput"
       title="Enter new name"

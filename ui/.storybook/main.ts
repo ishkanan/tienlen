@@ -1,4 +1,5 @@
 import type { StorybookConfig } from '@storybook/vue3-vite'
+
 const config: StorybookConfig = {
   stories: ['../src/**/*.mdx', '../src/**/*.stories.@(js|jsx|mjs|ts|tsx)'],
   staticDirs: ['../src/assets'],
@@ -15,4 +16,5 @@ const config: StorybookConfig = {
     autodocs: 'tag',
   },
 }
+
 export default config

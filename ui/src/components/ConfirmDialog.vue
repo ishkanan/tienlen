@@ -34,10 +34,10 @@ const handleClickOverlay = () => {
           <h4 v-if="title">{{ title }}</h4>
           <p v-if="message" class="message">{{ message }}</p>
           <div class="buttonRow">
-            <button class="button" @click.stop="() => handleClickButton(true)">
+            <button class="button is-info" @click.stop="() => handleClickButton(true)">
               {{ confirmButtonText }}
             </button>
-            <button class="button" @click.stop="() => handleClickButton(false)">
+            <button class="button is-danger" @click.stop="() => handleClickButton(false)">
               {{ cancelButtonText }}
             </button>
           </div>
@@ -86,15 +86,6 @@ const handleClickOverlay = () => {
 
 .button {
   margin-right: 12px;
-  height: 40px;
-
-  a {
-    font-style: normal;
-    font-weight: 600;
-    font-size: 15px;
-    line-height: 26px;
-    width: 191px;
-  }
 
   &:last-child {
     margin-right: 0;
