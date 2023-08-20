@@ -1,0 +1,10 @@
+.card {
+  background: repeating-linear-gradient(
+    45deg,
+    green,
+    green 2px,
+    darkgrey 2px,
+    darkgrey 4px
+  );
+  border-radius: 5px;
+}

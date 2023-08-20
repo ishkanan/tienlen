@@ -19,14 +19,14 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-export const WithDefaultButtonTexts: Story = {
+export const DefaultButtonTexts: Story = {
   args: {
     title: 'Some Title',
     message: 'Some message for giggles',
   },
 };
 
-export const WithNonDefaultButtonTexts: Story = {
+export const NonDefaultButtonTexts: Story = {
   args: {
     title: 'Some Title',
     message: 'Some message for giggles',

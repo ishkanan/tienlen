@@ -33,7 +33,6 @@ watch(
 )
 
 const onSelectedToggle = (card: Card, selected: Boolean) => {
-  console.log(card)
   selectedMap.value[card.globalRank] = selected
   if (!selected) delete selectedMap.value[card.globalRank]
   orderedCards.value = orderedCards.value.slice()
