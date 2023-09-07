@@ -21,16 +21,16 @@ const emit = defineEmits<{
   (e: 'confirm', confirmed: boolean, data: string): void
 }>()
 
-const name = ref(props.default)
+const value = ref(props.default)
 
-const validName = computed(() => name.value !== props.default && name.value !== '')
+const validInput = computed(() => value.value !== '')
 
 const handleClickButton = (confirm: boolean) => {
-  emit('confirm', confirm, name.value)
+  emit('confirm', confirm, value.value)
 }
 
 const handleClickOverlay = () => {
-  emit('confirm', false, name.value)
+  emit('confirm', false, value.value)
 }
 </script>
 
@@ -39,20 +39,24 @@ const handleClickOverlay = () => {
     <div class="shade" @click="handleClickOverlay">
       <transition name="zoom">
         <div class="dialog" @click.stop>
-          <h4 v-if="title">{{ title }}</h4>
+          <h4 v-if="title" class="title is-4">{{ title }}</h4>
           <p v-if="message" class="message">{{ message }}</p>
           <input
-            v-model="name"
+            v-model="value"
             class="input"
             type="text"
             maxlength="35"
             placeholder="Enter something..."
           />
           <div class="buttonRow">
-            <button class="button" @click.stop="() => handleClickButton(true)">
+            <button
+              class="button is-info"
+              :disabled="!validInput"
+              @click.stop="() => handleClickButton(true)"
+            >
               {{ confirmButtonText }}
             </button>
-            <button class="button" @click.stop="() => handleClickButton(false)">
+            <button class="button is-danger" @click.stop="() => handleClickButton(false)">
               {{ cancelButtonText }}
             </button>
           </div>
@@ -86,6 +90,10 @@ const handleClickOverlay = () => {
   & h4 {
     margin-top: 0;
   }
+
+  & p {
+    background-color: inherit;
+  }
 }
 
 .message {
@@ -101,15 +109,6 @@ const handleClickOverlay = () => {
 
 .button {
   margin-right: 12px;
-  height: 40px;
-
-  a {
-    font-style: normal;
-    font-weight: 600;
-    font-size: 15px;
-    line-height: 26px;
-    width: 191px;
-  }
 
   &:last-child {
     margin-right: 0;
@@ -117,7 +116,7 @@ const handleClickOverlay = () => {
 }
 
 .input {
-  width: 90%;
+  width: 100%;
   border-radius: 5px;
   padding: 10px;
   font-size: var(--font-size-s);

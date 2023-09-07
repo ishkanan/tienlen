@@ -31,7 +31,7 @@ const handleClickOverlay = () => {
     <div class="shade" @click="handleClickOverlay">
       <transition name="zoom">
         <div class="dialog" @click.stop>
-          <h4 v-if="title">{{ title }}</h4>
+          <h4 v-if="title" class="title is-4">{{ title }}</h4>
           <p v-if="message" class="message">{{ message }}</p>
           <div class="buttonRow">
             <button class="button is-info" @click.stop="() => handleClickButton(true)">
@@ -70,6 +70,10 @@ const handleClickOverlay = () => {
 
   & h4 {
     margin-top: 0;
+  }
+
+  & p {
+    background-color: inherit;
   }
 }
 

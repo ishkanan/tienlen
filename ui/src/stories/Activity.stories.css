@@ -1,0 +1,5 @@
+.activityArea {
+  height: 250px;
+  background-color: rgba(50, 50, 50, 0.8);
+  border: 3px black double;
+}
