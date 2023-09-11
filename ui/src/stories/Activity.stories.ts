@@ -22,7 +22,7 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-export const app = createApp(App)
+const app = createApp(App)
 
 app.use(createPinia())
 
