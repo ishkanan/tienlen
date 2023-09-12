@@ -134,10 +134,13 @@ export const init = (store: Store): Socket => {
       | ResetGameRequest
       | ChangeNameRequest
   }) => {
-    if (!socket || store.connState !== ConnectionState.Connected) return
     const message: Message = {
       kind,
       data: btoa(JSON.stringify(request)),
+    }
+    if (!socket || store.connState !== ConnectionState.Connected) {
+      console.log(message)
+      return
     }
     socket.send(JSON.stringify(message))
   }

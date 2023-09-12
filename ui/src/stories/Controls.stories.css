@@ -1,0 +1,6 @@
+.controlsArea {
+  width: 300px;
+  height: 140px;
+  background-color: rgba(255, 255, 255, 0.6);
+  border: 3px black double;
+}

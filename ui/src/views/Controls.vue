@@ -2,10 +2,14 @@
 import { computed, inject, ref } from 'vue'
 import ConfirmDialog from '../components/ConfirmDialog.vue'
 import InputDialog from '../components/InputDialog.vue'
-import { type Socket } from '../lib/socket'
 import { useGameStore } from '../stores/game'
 
-const socket: Socket | undefined = inject('socket')
+interface Socket {
+  requestChangeName: ({ name }: { name: string }) => void
+  requestResetGame: () => void
+}
+
+const socket = inject<Socket>('socket')
 
 const gameStore = useGameStore()
 
@@ -57,5 +61,9 @@ const handleConfirm = (confirm: boolean) => {
   flex-direction: column;
   align-items: center;
   justify-content: space-evenly;
+}
+
+.button {
+  width: 50%;
 }
 </style>
