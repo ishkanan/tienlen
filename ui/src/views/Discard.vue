@@ -29,35 +29,41 @@ const previousWinner = computed(() => {
 
 <template>
   <div :class="{ viewport: true, winner: previousWinner && inLobby }">
-    <h1 v-if="paused" class="message">Game is paused!</h1>
+    <h1 v-if="paused" class="title is-1 message">Game is paused!</h1>
 
     <template v-else-if="inLobby && previousWinner === undefined">
-      <h1 v-if="needMorePlayers && !canStart" class="message">Wait for more players...</h1>
-      <h1 v-else-if="needMorePlayers && canStart" class="message">
+      <h1 v-if="needMorePlayers && !canStart" class="title is-1 message">Wait for more players...</h1>
+      <h1 v-else-if="needMorePlayers && canStart" class="title is-1 message">
         Wait for more players
         <br />
         or start the game...
       </h1>
-      <h1 v-else class="message">Start the game...</h1>
+      <h1 v-else class="title is-1 message">Start the game...</h1>
     </template>
 
     <template v-else>
       <div class="messageAndLastPlayed">
-        <h3 v-if="inLobby && previousWinner">
+        <h1 v-if="inLobby && previousWinner" class="title is-1 message">
           The game has finished! One more?
-        </h3>
-        <h3 v-else-if="lastPlayedCards.length > 0 && !!lastPlayed">
-          {{ lastPlayed.name }} played:
-        </h3>
-        <div class="lastPlayed">
-          <CardView
-            v-for="card in lastPlayedCards"
-            :key="card.globalRank"
-            :card="card"
-            :selectable="false"
-            :show-face="true"
-          />
-        </div>
+        </h1>
+        <template v-else-if="lastPlayedCards.length > 0 && !!lastPlayed">
+          <h3 class="title is-3 message">
+            {{ lastPlayed.name }} played:
+          </h3>
+          <div class="lastPlayed">
+            <div
+              v-for="card in lastPlayedCards"
+              class="cardWrapper"
+            >
+              <CardView
+                :key="card.globalRank"
+                :card="card"
+                :selectable="false"
+                :show-face="true"
+              />
+            </div>
+          </div>
+        </template>
       </div>
     </template>
   </div>
@@ -81,7 +87,7 @@ const previousWinner = computed(() => {
   display: flex;
   align-items: center;
   flex-direction: column;
-  justify-content: center;
+  justify-content: space-evenly;
 
   & h3 {
     margin: 5px 0 0;
@@ -89,12 +95,14 @@ const previousWinner = computed(() => {
 }
 
 .lastPlayed {
-  width: 100%;
-  height: 100%;
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: center;
+}
+
+.cardWrapper {
+  min-width: 60px;
 }
 
 .winner {
@@ -102,8 +110,8 @@ const previousWinner = computed(() => {
 }
 
 .message {
+  background-color: transparent;
   color: black;
-  font-size: 40px;
   text-align: center;
   text-transform: uppercase;
 }

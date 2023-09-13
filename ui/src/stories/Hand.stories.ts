@@ -19,23 +19,23 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-const generateDeck = (): Card[] => {
-	const faces = [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 1, 2]
-	const suits = [Suit.Spades, Suit.Clubs, Suit.Diamonds, Suit.Hearts]
-	let deck: Card[] = []
-	let globalRank = 52
+export const generateDeck = (): Card[] => {
+  const faces = [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 1, 2]
+  const suits = [Suit.Spades, Suit.Clubs, Suit.Diamonds, Suit.Hearts]
+  let deck: Card[] = []
+  let globalRank = 52
 
-	faces.forEach((face, faceIndex) => {
-		suits.forEach(suit => {
-			deck.push({
-				suit,
-				faceValue: face,
-				suitRank: 13 - faceIndex,
-				globalRank,
-			})
-			globalRank--
-		})
-	})
+  faces.forEach((face, faceIndex) => {
+    suits.forEach(suit => {
+      deck.push({
+        suit,
+        faceValue: face,
+        suitRank: 13 - faceIndex,
+        globalRank,
+      })
+      globalRank--
+    })
+  })
 
   const randInt = (min: number, max: number) => (
     Math.floor(Math.random() * (max - min + 1) ) + min
