@@ -54,18 +54,20 @@ watch(
   <div v-if="opponent" class="viewport">
     <div class="player">
       <span class="nameBar">
-        <h4 :class="{ isTurn: opponent.isTurn }">{{ opponent.name }}</h4>
+        <h5 :class="{ isTurn: opponent.isTurn, 'title is-5': true }">
+          {{ opponent.name }}
+        </h5>
       </span>
 
       <div v-if="!opponent.connected" class="disconnected" />
 
       <div v-else-if="winPlace > 0" class="placed">
-        <h2 class="note">{{ ordinalisedWinPlace }}</h2>
+        <h4 class="title is-4 note">{{ ordinalisedWinPlace }}</h4>
       </div>
 
       <template v-else>
         <CardView class="card" :card="unfaced" :selectable="false" :show-face="false" />
-        <h2 v-if="opponent.cardsLeft > 0" class="cardsLeft">x {{ opponent.cardsLeft }}</h2>
+        <h4 v-if="opponent.cardsLeft > 0" class="title is-4 cardsLeft">x {{ opponent.cardsLeft }}</h4>
         <div v-if="passed" class="passed" />
       </template>
     </div>
@@ -92,7 +94,7 @@ watch(
   }
 
   & .cardsLeft {
-    top: -98px;
+    top: -77px;
     width: 80px;
     color: #f2f2f2;
     text-align: center;
@@ -101,7 +103,7 @@ watch(
   }
 
   & .passed {
-    top: -201px;
+    top: -171px;
     height: 120px;
     width: 120px;
     background: url(../assets/images/passed.png);
@@ -123,15 +125,16 @@ watch(
       border: 1px solid black;
       padding: 1px 5px 1px 5px;
     }
-  }
 
-  & h4 {
-    color: #f2f2f2;
-    margin: 10px 0 10px 0;
-    padding: 2px 6px 2px 6px;
+    & h5 {
+      color: #f2f2f2;
+      margin: 10px 0 10px 0;
+      padding: 2px 6px 2px 6px;
+    }
   }
 
   & .disconnected {
+    margin-top: 20px;
     width: 80px;
     height: 80px;
     background: url(../assets/images/disconnected.gif);
