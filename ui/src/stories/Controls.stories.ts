@@ -14,7 +14,6 @@ const meta = {
   decorators: [() => ({
     template: '<div class="controlsArea"><story/></div>'
   })],
-  tags: ['autodocs'],
   args: { },
 } satisfies Meta<typeof Controls>
 

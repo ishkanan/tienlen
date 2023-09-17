@@ -5,7 +5,6 @@ import ConfirmDialog from '../components/ConfirmDialog.vue'
 const meta = {
   title: 'ConfirmDialog',
   component: ConfirmDialog,
-  tags: ['autodocs'],
   argTypes: {
     title: { control: 'string' },
     message: { control: 'string' },

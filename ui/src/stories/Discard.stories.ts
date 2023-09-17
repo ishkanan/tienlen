@@ -16,7 +16,6 @@ const meta = {
   decorators: [() => ({
     template: '<div class="discardArea"><story/></div>'
   })],
-  tags: ['autodocs'],
   args: { },
 } satisfies Meta<typeof Discard>
 
@@ -31,26 +30,30 @@ const deck = generateDeck()
 
 const gameStore = useGameStore()
 
-gameStore.self = {
-  name: 'Mario',
-  position: 1,
-  cardsLeft: 0,
-  isPassed: false,
-  isTurn: false,
-  wonLastGame: false,
-  connected: true,
-  score: 0,
-  lastPlayed: false,
+const reset = () => {
+  gameStore.self = {
+    name: 'Mario',
+    position: 1,
+    cardsLeft: 0,
+    isPassed: false,
+    isTurn: false,
+    wonLastGame: false,
+    connected: true,
+    score: 0,
+    lastPlayed: false,
+  }  
 }
 
 export const PausedGame: Story = {
   play: async () => {
+    reset()
     gameStore.gameState = GameState.Paused
   }
 }
 
 export const FirstGameLobbyNoOpponents: Story = {
   play: async () => {
+    reset()
     gameStore.gameState = GameState.InLobby
     gameStore.opponents = []
     gameStore.self!.wonLastGame = false
@@ -59,6 +62,7 @@ export const FirstGameLobbyNoOpponents: Story = {
 
 export const FirstGameLobbySomeOpponents: Story = {
   play: async () => {
+    reset()
     gameStore.gameState = GameState.InLobby
     gameStore.opponents = [
       {
@@ -79,6 +83,7 @@ export const FirstGameLobbySomeOpponents: Story = {
 
 export const FirstGameLobbyAllOpponents: Story = {
   play: async () => {
+    reset()
     gameStore.gameState = GameState.InLobby
     gameStore.opponents = [
       {
@@ -121,6 +126,7 @@ export const FirstGameLobbyAllOpponents: Story = {
 
 export const NextGameLobbyWaitingToStart: Story = {
   play: async () => {
+    reset()
     gameStore.gameState = GameState.InLobby
     gameStore.self!.wonLastGame = true
     gameStore.lastPlayed = []
@@ -129,6 +135,7 @@ export const NextGameLobbyWaitingToStart: Story = {
 
 export const InProgressNoCardsPlayed: Story = {
   play: async () => {
+    reset()
     gameStore.gameState = GameState.Running
     gameStore.lastPlayed = []
   }
@@ -136,6 +143,7 @@ export const InProgressNoCardsPlayed: Story = {
 
 export const InProgressSomeCardsPlayed: Story = {
   play: async () => {
+    reset()
     gameStore.gameState = GameState.Running
     gameStore.lastPlayed = deck.slice(0, 5)
     gameStore.self!.lastPlayed = true
@@ -144,6 +152,7 @@ export const InProgressSomeCardsPlayed: Story = {
 
 export const InProgressManyCardsPlayed: Story = {
   play: async () => {
+    reset()
     gameStore.gameState = GameState.Running
     gameStore.lastPlayed = deck.slice(0, 13)
     gameStore.self!.lastPlayed = true

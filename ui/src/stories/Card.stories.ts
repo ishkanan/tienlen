@@ -6,7 +6,6 @@ import { Suit } from '../lib/models'
 const meta = {
   title: 'Card',
   component: Card,
-  tags: ['autodocs'],
   argTypes: {
     card: { control: 'object' },
     selectable: { control: 'boolean' },

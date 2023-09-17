@@ -15,7 +15,6 @@ const meta = {
   decorators: [() => ({
     template: '<div class="activityArea"><story/></div>'
   })],
-  tags: ['autodocs'],
   args: { },
 } satisfies Meta<typeof Activity>
 
@@ -47,6 +46,38 @@ export const ErrorTextOnly: Story = {
   play: async () => {
     pushEvent({
       severity: EventSeverity.Error,
+      runes: [
+        {
+          message: 'You joined the game',
+        },
+        {
+          message: ', and you look great.',
+        }
+      ]
+    })
+  }
+}
+
+export const WarningTextOnly: Story = {
+  play: async () => {
+    pushEvent({
+      severity: EventSeverity.Warning,
+      runes: [
+        {
+          message: 'You joined the game',
+        },
+        {
+          message: ', and you look great.',
+        }
+      ]
+    })
+  }
+}
+
+export const SuccessTextOnly: Story = {
+  play: async () => {
+    pushEvent({
+      severity: EventSeverity.Success,
       runes: [
         {
           message: 'You joined the game',

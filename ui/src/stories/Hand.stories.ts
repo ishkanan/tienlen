@@ -8,12 +8,12 @@ import './Card.stories.css'
 const meta = {
   title: 'Hand',
   component: Hand,
-  tags: ['autodocs'],
   argTypes: {
     cards: { control: 'object' },
     onSelected: { action: 'clicked' },
   },
   args: { },
+  excludeStories: ['generateDeck'],
 } satisfies Meta<typeof Hand>
 
 export default meta
@@ -53,12 +53,12 @@ export const generateDeck = (): Card[] => {
 
 export const FullHand: Story = {
   args: {
-    cards: generateDeck().slice(0, 13),
+    cards: generateDeck().slice(0, 13).sort((a, b) => b.globalRank - a.globalRank),
   },
 }
 
 export const SmallHand: Story = {
   args: {
-    cards: generateDeck().slice(0, 5),
+    cards: generateDeck().slice(0, 5).sort((a, b) => b.globalRank - a.globalRank),
   },
 }

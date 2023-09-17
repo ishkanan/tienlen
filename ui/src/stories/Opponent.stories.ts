@@ -4,7 +4,6 @@ import { createApp } from 'vue'
 
 import Opponent from '../views/Opponent.vue'
 import { useGameStore } from '../stores/game'
-import { GameState } from '../lib/messages'
 import App from '../App.vue'
 import { generateDeck } from './Hand.stories'
 
@@ -16,7 +15,6 @@ const meta = {
   decorators: [() => ({
     template: '<div class="opponentArea"><story/></div>'
   })],
-  tags: ['autodocs'],
   argTypes: {
     position: { control: 'number' },
   },

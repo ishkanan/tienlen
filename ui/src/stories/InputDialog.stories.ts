@@ -5,7 +5,6 @@ import InputDialog from '../components/InputDialog.vue'
 const meta = {
   title: 'InputDialog',
   component: InputDialog,
-  tags: ['autodocs'],
   argTypes: {
     title: { control: 'string' },
     message: { control: 'string' },
