@@ -41,120 +41,152 @@ const reset = () => {
     connected: true,
     score: 0,
     lastPlayed: false,
-  }  
+  }
 }
 
 export const PausedGame: Story = {
-  play: async () => {
-    reset()
-    gameStore.gameState = GameState.Paused
-  }
+  loaders: [
+    async () => ({
+      work: function () {
+        reset()
+        gameStore.gameState = GameState.Paused
+      }()
+    })
+  ]
 }
 
 export const FirstGameLobbyNoOpponents: Story = {
-  play: async () => {
-    reset()
-    gameStore.gameState = GameState.InLobby
-    gameStore.opponents = []
-    gameStore.self!.wonLastGame = false
-  }
+  loaders: [
+    async () => ({
+      work: function () {
+        reset()
+        gameStore.gameState = GameState.InLobby
+        gameStore.opponents = []
+        gameStore.self!.wonLastGame = false
+      }()
+    })
+  ]
 }
 
 export const FirstGameLobbySomeOpponents: Story = {
-  play: async () => {
-    reset()
-    gameStore.gameState = GameState.InLobby
-    gameStore.opponents = [
-      {
-        name: 'Luigi',
-        position: 2,
-        cardsLeft: 13,
-        isPassed: false,
-        isTurn: false,
-        wonLastGame: false,
-        connected: true,
-        score: 3,
-        lastPlayed: false,
-      }
-    ]
-    gameStore.self!.wonLastGame = false
-  }
+  loaders: [
+    async () => ({
+      work: function () {
+        reset()
+        gameStore.gameState = GameState.InLobby
+        gameStore.opponents = [
+          {
+            name: 'Luigi',
+            position: 2,
+            cardsLeft: 13,
+            isPassed: false,
+            isTurn: false,
+            wonLastGame: false,
+            connected: true,
+            score: 3,
+            lastPlayed: false,
+          }
+        ]
+        gameStore.self!.wonLastGame = false
+      }()
+    })
+  ]
 }
 
 export const FirstGameLobbyAllOpponents: Story = {
-  play: async () => {
-    reset()
-    gameStore.gameState = GameState.InLobby
-    gameStore.opponents = [
-      {
-        name: 'Luigi',
-        position: 2,
-        cardsLeft: 13,
-        isPassed: false,
-        isTurn: false,
-        wonLastGame: false,
-        connected: true,
-        score: 3,
-        lastPlayed: false,
-      },
-      {
-        name: 'Peach',
-        position: 3,
-        cardsLeft: 13,
-        isPassed: false,
-        isTurn: false,
-        wonLastGame: false,
-        connected: true,
-        score: 8,
-        lastPlayed: false,
-      },
-      {
-        name: 'Toad',
-        position: 4,
-        cardsLeft: 13,
-        isPassed: false,
-        isTurn: false,
-        wonLastGame: false,
-        connected: true,
-        score: 12,
-        lastPlayed: false,
-      },
-    ]
-    gameStore.self!.wonLastGame = false
-  }
+  loaders: [
+    async () => ({
+      work: function () {
+        reset()
+        gameStore.gameState = GameState.InLobby
+        gameStore.opponents = [
+          {
+            name: 'Luigi',
+            position: 2,
+            cardsLeft: 13,
+            isPassed: false,
+            isTurn: false,
+            wonLastGame: false,
+            connected: true,
+            score: 3,
+            lastPlayed: false,
+          },
+          {
+            name: 'Peach',
+            position: 3,
+            cardsLeft: 13,
+            isPassed: false,
+            isTurn: false,
+            wonLastGame: false,
+            connected: true,
+            score: 8,
+            lastPlayed: false,
+          },
+          {
+            name: 'Toad',
+            position: 4,
+            cardsLeft: 13,
+            isPassed: false,
+            isTurn: false,
+            wonLastGame: false,
+            connected: true,
+            score: 12,
+            lastPlayed: false,
+          },
+        ]
+        gameStore.self!.wonLastGame = false
+      }()
+    })
+  ]
 }
 
 export const NextGameLobbyWaitingToStart: Story = {
-  play: async () => {
-    reset()
-    gameStore.gameState = GameState.InLobby
-    gameStore.self!.wonLastGame = true
-    gameStore.lastPlayed = []
-  }
+  loaders: [
+    async () => ({
+      work: function () {
+        reset()
+        gameStore.gameState = GameState.InLobby
+        gameStore.self!.wonLastGame = true
+        gameStore.lastPlayed = []
+      }()
+    })
+  ]
 }
 
 export const InProgressNoCardsPlayed: Story = {
-  play: async () => {
-    reset()
-    gameStore.gameState = GameState.Running
-    gameStore.lastPlayed = []
-  }
+  loaders: [
+    async () => ({
+      work: function () {
+        reset()
+        gameStore.gameState = GameState.Running
+        gameStore.lastPlayed = []
+      }()
+    })
+  ]
 }
 
 export const InProgressSomeCardsPlayed: Story = {
-  play: async () => {
-    reset()
-    gameStore.gameState = GameState.Running
-    gameStore.lastPlayed = deck.slice(0, 5)
-    gameStore.self!.lastPlayed = true
-  }
+  loaders: [
+    async () => ({
+      work: function () {
+        reset()
+        gameStore.gameState = GameState.Running
+        gameStore.lastPlayed = deck.slice(0, 5)
+        gameStore.self!.lastPlayed = true
+      }()
+    })
+  ]
 }
 
 export const InProgressManyCardsPlayed: Story = {
-  play: async () => {
-    reset()
-    gameStore.gameState = GameState.Running
-    gameStore.lastPlayed = deck.slice(0, 13)
-    gameStore.self!.lastPlayed = true
-  }
+  loaders: [
+    async () => ({
+      work: function () {
+        reset()
+        gameStore.gameState = GameState.Running
+        gameStore.lastPlayed = deck.slice(0, 13)
+        gameStore.self!.lastPlayed = true
+      }()
+    })
+  ]
 }

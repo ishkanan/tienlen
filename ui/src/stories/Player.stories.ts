@@ -2,20 +2,22 @@ import type { Meta, StoryObj } from '@storybook/vue3'
 import { createPinia } from 'pinia'
 import { createApp } from 'vue'
 
-import Score from '../views/Score.vue'
+import Player from '../views/Player.vue'
 import { useGameStore } from '../stores/game'
 import App from '../App.vue'
+import { generateDeck } from './Hand.stories'
 
-import './Score.stories.css'
+import './Player.stories.css'
+import { GameState } from '@/lib/messages'
 
 const meta = {
-  title: 'Score',
-  component: Score,
+  title: 'Player',
+  component: Player,
   decorators: [() => ({
-    template: '<div class="scoreArea"><story/></div>'
+    template: '<div class="playerArea"><story/></div>'
   })],
   args: { },
-} satisfies Meta<typeof Score>
+} satisfies Meta<typeof Player>
 
 export default meta
 type Story = StoryObj<typeof meta>
@@ -23,6 +25,8 @@ type Story = StoryObj<typeof meta>
 const app = createApp(App)
 
 app.use(createPinia())
+
+const deck = generateDeck()
 
 const gameStore = useGameStore()
 
@@ -32,12 +36,16 @@ const reset = () => {
     position: 1,
     cardsLeft: 13,
     isPassed: false,
-    isTurn: true,
+    isTurn: false,
     wonLastGame: false,
     connected: true,
-    score: 5,
+    score: 0,
     lastPlayed: false,
   }
+
+  gameStore.gameState = GameState.InLobby
+
+  gameStore.selfHand = []
 
   gameStore.opponents = [
     {
@@ -74,25 +82,16 @@ const reset = () => {
       lastPlayed: false,
     },
   ]
+
+  gameStore.winPlaces = []
 }
 
-export const FourPlayers: Story = {
+export const GameCanStart: Story = {
   loaders: [
     async () => ({
       work: function () {
         reset()
-        gameStore.winPlaces = []
-      }()
-    })
-  ]
-}
-
-export const FourPlayersEndGame: Story = {
-  loaders: [
-    async () => ({
-      work: function () {
-        reset()
-        gameStore.winPlaces = gameStore.opponents.concat(gameStore.self!)
+        gameStore.selfHand = deck.slice(0, 14)
       }()
     })
   ]

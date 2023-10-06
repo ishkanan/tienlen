@@ -5,7 +5,6 @@ import { createApp } from 'vue'
 import Opponent from '../views/Opponent.vue'
 import { useGameStore } from '../stores/game'
 import App from '../App.vue'
-import { generateDeck } from './Hand.stories'
 
 import './Opponent.stories.css'
 
@@ -27,8 +26,6 @@ type Story = StoryObj<typeof meta>
 const app = createApp(App)
 
 app.use(createPinia())
-
-const deck = generateDeck()
 
 const gameStore = useGameStore()
 
@@ -66,57 +63,81 @@ export const Disconnected: Story = {
   args: {
     position: 2,
   },
-  play: async () => {
-    reset()
-    gameStore.opponents[0].connected = false
-  }
+  loaders: [
+    async () => ({
+      work: function () {
+        reset()
+        gameStore.opponents[0].connected = false
+      }()
+    })
+  ]
 }
 
 export const WonFirstPlace: Story = {
   args: {
     position: 2,
   },
-  play: async () => {
-    reset()
-    gameStore.winPlaces = gameStore.opponents.concat(gameStore.self!)
-  }
+  loaders: [
+    async () => ({
+      work: function () {
+        reset()
+        gameStore.winPlaces = gameStore.opponents.concat(gameStore.self!)
+      }()
+    })
+  ]
 }
 
 export const WonSecondPlace: Story = {
   args: {
     position: 2,
   },
-  play: async () => {
-    reset()
-    gameStore.winPlaces = [gameStore.self!].concat(gameStore.opponents)
-  }
+  loaders: [
+    async () => ({
+      work: function () {
+        reset()
+        gameStore.winPlaces = [gameStore.self!].concat(gameStore.opponents)
+      }()
+    })
+  ]
 }
 
 export const IsTurn: Story = {
   args: {
     position: 2,
   },
-  play: async () => {
-    reset()
-    gameStore.opponents[0].isTurn = true
-  }
+  loaders: [
+    async () => ({
+      work: function () {
+        reset()
+        gameStore.opponents[0].isTurn = true
+      }()
+    })
+  ]
 }
 
 export const Waiting: Story = {
   args: {
     position: 2,
   },
-  play: async () => {
-    reset()
-  }
+  loaders: [
+    async () => ({
+      work: function () {
+        reset()
+      }()
+    })
+  ]
 }
 
 export const Passed: Story = {
   args: {
     position: 2,
   },
-  play: async () => {
-    reset()
-    gameStore.opponents[0].isPassed = true
-  }
+  loaders: [
+    async () => ({
+      work: function () {
+        reset()
+        gameStore.opponents[0].isPassed = true
+      }()
+    })
+  ]
 }

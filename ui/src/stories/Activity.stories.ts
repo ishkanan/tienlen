@@ -43,78 +43,86 @@ const pushEvent = ({
 }
 
 export const ErrorTextOnly: Story = {
-  play: async () => {
-    pushEvent({
-      severity: EventSeverity.Error,
-      runes: [
-        {
-          message: 'You joined the game',
-        },
-        {
-          message: ', and you look great.',
-        }
-      ]
+  loaders: [
+    async () => ({
+      work: pushEvent({
+        severity: EventSeverity.Error,
+        runes: [
+          {
+            message: 'You joined the game',
+          },
+          {
+            message: ', and you look great.',
+          }
+        ]
+      })
     })
-  }
+  ]
 }
 
 export const WarningTextOnly: Story = {
-  play: async () => {
-    pushEvent({
-      severity: EventSeverity.Warning,
-      runes: [
-        {
-          message: 'You joined the game',
-        },
-        {
-          message: ', and you look great.',
-        }
-      ]
+  loaders: [
+    async () => ({
+      work: pushEvent({
+        severity: EventSeverity.Warning,
+        runes: [
+          {
+            message: 'You joined the game',
+          },
+          {
+            message: ', and you look great.',
+          }
+        ]
+      })
     })
-  }
+  ]
 }
 
 export const SuccessTextOnly: Story = {
-  play: async () => {
-    pushEvent({
-      severity: EventSeverity.Success,
-      runes: [
-        {
-          message: 'You joined the game',
-        },
-        {
-          message: ', and you look great.',
-        }
-      ]
+  loaders: [
+    async () => ({
+      work: pushEvent({
+        severity: EventSeverity.Success,
+        runes: [
+          {
+            message: 'You joined the game',
+          },
+          {
+            message: ', and you look great.',
+          }
+        ]
+      })
     })
-  }
+  ]
 }
 
 export const InfoTextAndRunes: Story = {
-  play: async () => {
-    pushEvent({
-      severity: EventSeverity.Info,
-      runes: [
-        {
-          message: 'You played ',
-        },
-        {
-          card: {
-            suit: Suit.Clubs,
-            faceValue: 3,
-            suitRank: 13,
-            globalRank: 52,
+  loaders: [
+    async () => ({
+      work: pushEvent({
+        severity: EventSeverity.Info,
+        runes: [
+          {
+            message: 'You played ',
+          },
+          {
+            card: {
+              suit: Suit.Clubs,
+              faceValue: 3,
+              suitRank: 13,
+              globalRank: 52,
+            }
+          },
+          {
+            card: {
+              suit: Suit.Hearts,
+              faceValue: 3,
+              suitRank: 13,
+              globalRank: 13,
+            }
           }
-        },
-        {
-          card: {
-            suit: Suit.Hearts,
-            faceValue: 3,
-            suitRank: 13,
-            globalRank: 13,
-          }
-        }
-      ]
+        ]
+      })
     })
-  }
+  ]
 }
